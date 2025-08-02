@@ -1,0 +1,423 @@
+---
+julia:
+    execflags: 
+      - "--project=."
+---
+
+
+```{julia}
+using DataFramesMeta
+using ReadStatTables
+using Statistics
+using Dates
+include("con-fun.jl")
+```
+
+
+
+## Define the path and load the data
+```{julia}
+path = "C:\\quarto_website\\quarto_project\\Datasets"
+pc = @chain readstat(joinpath(path, "pc.xpt")) DataFrame convert_blanks_to_missing
+ex = @chain readstat(joinpath(path, "ex.xpt")) DataFrame convert_blanks_to_missing
+vs = @chain readstat(joinpath(path, "vs.xpt")) DataFrame convert_blanks_to_missing
+lb = @chain readstat(joinpath(path, "lb.xpt")) DataFrame convert_blanks_to_missing
+adsl = @chain readstat(joinpath(path, "adsl.xpt")) DataFrame convert_blanks_to_missing
+first(adsl, 5)
+
+```
+
+## Lookup table
+
+
+```{julia}
+param_lookup = DataFrame(
+    PCTESTCD = ["XAN", "DOSE"],
+    PARAMCD = ["XAN", "DOSE"],
+    PARAM = ["Pharmacokinetic concentration of Xanomeline", "Xanomeline Patch Dose"],
+    PARAMN = [1, 2]
+)
+   
+dose_freq_lookup = DataFrame(
+    CDISC_VALUE = ["QD", "BID", "TID", "QID"],
+    HOURS_BETWEEN_DOSES = [24, 12, 8, 6]
+)
+adsl_subset = @chain adsl begin
+    @select :STUDYID :USUBJID :TRTSDT :TRTSDTM :TRT01P :TRT01A
+end
+first(adsl_subset, 5)
+```
+
+
+
+
+## PC data preparation
+```{julia}
+pc_prep = @chain pc begin
+    leftjoin(adsl_subset, on = [:STUDYID, :USUBJID])
+
+    @rtransform :ADTM = parse_datetime_column(:PCDTC)
+    @rtransform :ADT = Date(:ADTM)
+    @rtransform :ATM = Time(:ADTM)
+    @rtransform :ADY = Dates.value(:ADT - :TRTSDT) + 1
+    
+    @rtransform begin
+        :EVID = 0
+        :DRUG = :PCTEST
+        :NFRLT = :PCTPTNUM < 0 ? 0 : :PCTPTNUM 
+    end
+end
+first(pc_prep, 5)
+
+```
+
+
+
+
+## ex data Prep
+
+```{julia}
+ex_prep = @chain ex begin
+    leftjoin(adsl_subset, on = [:STUDYID, :USUBJID])
+
+    @rsubset :EXDOSE > 0
+
+    @rtransform :ASTDTM = parse_datetime_column(:EXSTDTC)
+    @rtransform @passmissing :AENDTM = parse_datetime_column(:EXENDTC)
+    @rtransform :ASTDT = Date(:ASTDTM)
+    @rtransform @passmissing :AENDT = Date(:AENDTM)
+    @rtransform :AENDTM = ismissing(:AENDTM) ? :ASTDTM : :AENDTM
+
+    @rtransform begin
+        :EVID = 1
+        :NFRLT = :VISITDY == 1 ? 0 : 24 * :VISITDY
+    end
+end
+first(ex_prep, 5)
+
+```
+
+
+
+## EXPANDING DOSE
+```{julia}
+ex_exp = @chain ex_prep begin
+
+    leftjoin(dose_freq_lookup, on = [:EXDOSFRQ => :CDISC_VALUE])
+    expand_dose_dataframe
+
+    @rtransform :AVISIT = "Day $(:AVISITN)"
+    @rtransform :DRUG = :EXTRT
+
+    @rtransform :ADT = Date(:ADTM)
+    @rtransform :ATM = Time(:ADTM)
+    @rtransform :ASTTM = Time(:ASTDTM)
+    @rtransform :AENTM = Time(:AENDTM)
+    @rtransform :ADY = Dates.value(:ADT - :TRTSDT) + 1
+end     
+
+first(ex_exp, 5)
+```
+
+
+## Filter ex_expanded for valid doses and ADTM
+
+```{julia}
+adpc_first_dose = @chain ex_exp begin
+
+    @rsubset :EXDOSE > 0 && !ismissing(:ADTM)
+
+    combine(groupby(_,[:STUDYID, :USUBJID, :DRUG]),:ADTM => (x->minimum(x)) => :FANLDTM)
+
+    leftjoin(pc_prep,_,on = [:STUDYID, :USUBJID, :DRUG], makeunique=true)
+
+    @rsubset !ismissing(:FANLDTM)
+
+    @rtransform :AVISITN = (:NFRLT ÷ 24) + 1
+    @rtransform :AVISIT = "Day $(:AVISITN)"
+end
+first(adpc_first_dose, 5)
+
+```
+
+
+
+## FIND PREVIOUS DOSE
+## FIND NEXT DOSE
+
+```{julia}
+adpc_nom_next = @chain adpc_first_dose begin
+    find_previous_dose(ex_exp)
+    find_next_dose(ex_exp)
+    find_previous_nominal_time(ex_exp)
+    find_next_nominal_time(ex_exp)
+end
+first(adpc_nom_next, 5)
+
+```
+
+
+
+# Derive Relative Time Variables
+
+```{julia}
+adpc_arrlt = vcat(adpc_nom_next, ex_exp,cols = :union)
+adpc_arrlt.USUBJID = String.(adpc_arrlt.USUBJID)
+adpc_arrlt.DRUG = String.(adpc_arrlt.DRUG)
+
+adpc_arrlt = @chain adpc_arrlt begin
+    @groupby([:USUBJID, :DRUG])
+    @transform(
+        :maxdate = begin
+            ev0_idx = (:EVID .== 0) .&& .!ismissing.(:ADT)
+            isempty(:ADT[ev0_idx]) ? missing : maximum(:ADT[ev0_idx])
+        end,
+        :FANLDTM = minimum(skipmissing(:FANLDTM)),
+        :min_NFRLT = minimum(skipmissing(:NFRLT_prev))
+    )
+
+    @rsubset(:ADT <= :maxdate || ismissing(:maxdate))
+
+    @rtransform :AFRLT = ismissing(:FANLDTM) || ismissing(:ADTM) ?
+                         missing : Dates.value(:ADTM - :FANLDTM) / 3600000
+
+    @rtransform :ARRLT = ismissing(:ADTM_prev) || ismissing(:ADTM) ?
+                         missing : Dates.value(:ADTM - :ADTM_prev) / 3600000
+
+    @rtransform :AXRLT = ismissing(:ADTM_next) || ismissing(:ADTM) ?
+                         missing : Dates.value(:ADTM - :ADTM_next) / 3600000
+
+    @rtransform :ARRLT = (:EVID == 1) ? 0 : ismissing(:ARRLT) ? :AXRLT : :ARRLT
+
+    @rtransform :PCRFTDTM = (:EVID == 1) ? :ADTM :
+                            ismissing(:ADTM_prev) ? :ADTM_next : :ADTM_prev
+
+    @rtransform @passmissing begin
+        :FANLDT = Date(:FANLDTM)
+        :FANLTM = Time(:FANLDTM)
+        :PCRFTDT = Date(:PCRFTDTM)
+        :PCRFTTM = Time(:PCRFTDTM)
+    end
+end
+first(adpc_arrlt, 5)
+
+```
+
+
+
+## Derive Nominal Relative Time from Reference Dose (NRRLT)
+
+```{julia}
+adpc_nrrlt = @chain adpc_arrlt begin
+    @rtransform begin
+        :NRRLT = :EVID == 1 ? 0.0 :
+                    ismissing(:NFRLT_prev) ? :NFRLT - :min_NFRLT :
+                    :NFRLT - :NFRLT_prev
+
+        :NXRLT = :EVID == 1 ? 0.0 :
+                    :NFRLT - :NFRLT_next
+    end
+end
+first(adpc_nrrlt, 5)
+
+```
+
+
+
+
+# Derive Analysis Variables
+
+```{julia}
+adpc_aval = @chain adpc_nrrlt begin
+    @rtransform :PARCAT1 = :PCSPEC
+
+    @rtransform :ATPTN = (:EVID == 1) ? 0 : :PCTPTNUM
+    @rtransform :ATPT = (:EVID == 1) ? "Dose" : :PCTPT
+
+    @rtransform :ATPTREF = (:EVID == 1) ? :AVISIT : (ismissing(:AVISIT_prev) ? :AVISIT_next : :AVISIT_prev)
+
+    @rtransform :ABLFL = (:ATPT == "Pre-dose") ? "Y" : missing
+
+    @rtransform :BASETYPE = string(:ATPTREF, " Baseline")
+
+    @rtransform :DOSEA = (:EVID == 1) ? :EXDOSE : (ismissing(:EXDOSE_prev) ? :EXDOSE_next : :EXDOSE_prev)
+
+    @rtransform :DOSEP = (:TRT01P == "Xanomeline High Dose") ? 81 : ((:TRT01P == "Xanomeline Low Dose") ? 54 : missing)
+    @rtransform :DOSEU = "mg"
+
+    @rtransform :FRLTU = "h"
+    @rtransform :RRLTU = "h"
+
+    @rtransform :PARAMCD = coalesce(:PCTESTCD, "DOSE")
+    @rtransform :ALLOQ = :PCLLOQ
+
+    @rtransform :AVAL = 
+        (:EVID == 1) ? :EXDOSE :
+        ((:PCSTRESC == "<BLQ" && !ismissing(:NFRLT) && :NFRLT == 0) ? 0 :
+        ((:PCSTRESC == "<BLQ" && !ismissing(:NFRLT) && :NFRLT > 0) ? 0.5 * :ALLOQ :
+        (!ismissing(:PCSTRESN) ? :PCSTRESN : missing)))
+
+    @rtransform :AVALU = (:EVID == 1) ? :EXDOSU : :PCSTRESU
+
+    @rtransform :AVALCAT1 = (!ismissing(:PCSTRESC) && :PCSTRESC == "<BLQ") ? "<BLQ" :
+                             (ismissing(:AVAL) ? missing : string(round(:AVAL, sigdigits=3)))
+
+    @rtransform :SRCDOM = :DOMAIN
+    @rtransform :SRCVAR = "SEQ"
+    @rtransform :SRCSEQ = coalesce(:PCSEQ, :EXSEQ)
+end
+first(adpc_aval, 5)
+
+```
+
+
+
+# Create DTYPE copy records 
+
+```{julia}
+dtype = @chain adpc_aval begin
+    @subset(
+        .!ismissing.(:NFRLT) .&& :NFRLT .> 0 .&&
+        .!ismissing.(:NXRLT) .&& :NXRLT .== 0 .&&
+        .!ismissing.(:EVID) .&& :EVID .== 0 .&&
+        .!ismissing.(:AVISIT_next)
+    )
+    
+    @select Not([:PCRFTDT, :PCRFTTM])
+    
+    @rtransform(
+        :ABLFL = "Y",
+        :ATPTREF = :AVISIT_next,
+        :ARRLT = :AXRLT,
+        :NRRLT = :NXRLT,
+        :PCRFTDTM = :ADTM_next,
+        :DOSEA = :EXDOSE_next,
+        :BASETYPE = string(:AVISIT_next, " Baseline"),
+        :ATPT = "Pre-dose",
+        :ATPTN = -0.5,
+        :DTYPE = "COPY"
+    )
+    
+  @rtransform begin
+        :PCRFTDT = ismissing(:PCRFTDTM) ? missing : Date(:PCRFTDTM)
+        :PCRFTTM = ismissing(:PCRFTDTM) ? missing : Dates.format(:PCRFTDTM, "HH:MM:SS")
+    end
+end
+first(dtype, 5)
+
+```
+
+
+
+#  Combine original records and DTYPE copy records
+
+```{julia}
+adpc_dtype = @chain vcat(adpc_aval, dtype; cols = :union) begin
+    sort!([:STUDYID, :USUBJID, :BASETYPE, :ADTM, :NFRLT])
+
+    @rtransform :MRRLT = (!ismissing(:ARRLT) && :ARRLT < 0) ? 0 : :ARRLT
+
+    @rtransform :ANL01FL = "Y"
+
+    @rtransform :ANL02FL = ismissing(:DTYPE) ? "Y" : missing
+end
+first(adpc_dtype, 5)
+
+```
+
+
+
+#  Derive BASE and Calculate Change from Baseline 
+
+```{julia}
+adpc_base = @chain adpc_dtype begin
+    groupby([:STUDYID, :USUBJID, :PARAMCD, :PARCAT1, :BASETYPE])
+    @transform :BASE = begin
+        base_vals = :AVAL[ .!ismissing.(:ABLFL) .& (:ABLFL .== "Y") ]
+        isempty(base_vals) ? missing : base_vals[1]
+    end
+end
+first(adpc_base, 5)
+
+```
+
+
+
+# Calculate CHG for post-baseline records
+
+```{julia}
+adpc_chg = @chain adpc_base begin
+    @rtransform :CHG = (!ismissing(:AVISITN) && :AVISITN > 0 && !ismissing(:AVAL) && !ismissing(:BASE)) ?
+                        :AVAL - :BASE : missing
+end
+first(adpc_chg, 5)
+
+```
+
+
+
+# Add ASEQ 
+
+```{julia}
+adpc_aseq = @chain adpc_chg begin
+           groupby([:STUDYID, :USUBJID])
+           @transform :ASEQ = 1:length(:STUDYID)
+
+
+           @select(Not([:DOMAIN, :PCSEQ, :DRUG, :EVID, :AXRLT, :NXRLT, :VISITDY]))
+           @select(Not(r"^orig"))
+           @select(Not(r"^min"))
+           @select(Not(r"^max"))
+           @select(Not(r"^EX"))
+           @select(Not(r"next$"))
+           @select(Not(r"prev$"))
+
+           leftjoin(param_lookup[:, Not(:PCTESTCD)], on = :PARAMCD) 
+       end
+first(adpc_aseq, 5)
+
+```
+
+
+
+# Derive additional baselines from VS
+
+```{julia}
+vs_height = @chain vs begin
+    @rsubset :VSTESTCD == "HEIGHT"
+    @select :STUDYID :USUBJID :VSSTRESN :VSSTRESU
+    rename(:VSSTRESN => :HTBL, :VSSTRESU => :HTBLU)
+end
+
+vs_weight = @chain vs begin
+    @rsubset :VSTESTCD == "WEIGHT" && :VSBLFL == "Y"
+    @select :STUDYID :USUBJID :VSSTRESN :VSSTRESU
+    rename(:VSSTRESN => :WTBL, :VSSTRESU => :WTBLU)
+end
+
+adpc_baselines = @chain adpc_aseq begin
+    leftjoin(vs_height, on = [:STUDYID, :USUBJID])
+    leftjoin(vs_weight, on = [:STUDYID, :USUBJID])
+    @rtransform begin
+        :BMIBL = (!ismissing(:HTBL) && !ismissing(:WTBL) && :HTBL > 0) ?
+                 round(:WTBL / ((:HTBL / 100)^2), digits=2) : missing
+        :BMIBLU = "kg/m^2"
+    end
+end
+first(adpc_baselines, 5)
+
+
+```
+
+
+
+# Add all ADSL variables
+
+```{julia}
+adpc = @chain adpc_baselines begin
+    leftjoin(adsl, on = [:STUDYID, :USUBJID], makeunique = true)
+end
+first(adpc, 5)
+
+```
+

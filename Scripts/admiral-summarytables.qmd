@@ -1,0 +1,1080 @@
+---
+julia:
+    execflags: 
+      - "--project=."
+---
+
+<details>
+<summary> Package Imports and Setup</summary>
+
+
+## Load Packages
+```{julia}
+using DataFrames
+using CategoricalArrays
+using DataFramesMeta
+using ReadStatTables
+using SummaryTables
+using Printf
+using HypothesisTests
+using ReadStat
+using StatsModels, StatsPlots, Statistics
+
+include("con-fun.jl")
+```
+
+</details>
+<details>
+<summary>Data Loading</summary>
+
+
+## Read the datasets
+
+```{julia}
+path = "C:\\quarto_website\\quarto_project\\Datasets"
+pc = @chain readstat(joinpath(path, "pc.xpt")) DataFrame convert_blanks_to_missing
+ex = @chain readstat(joinpath(path, "ex.xpt")) DataFrame convert_blanks_to_missing
+vs = @chain readstat(joinpath(path, "vs.xpt")) DataFrame convert_blanks_to_missing
+lb = @chain readstat(joinpath(path, "lb.xpt")) DataFrame convert_blanks_to_missing
+adsl = @chain readstat(joinpath(path, "adsl.xpt")) DataFrame convert_blanks_to_missing
+adsl_orig = @chain readstat(joinpath(path, "adsl_orig.xpt")) DataFrame convert_blanks_to_missing
+adqsadas_orig = @chain readstat(joinpath(path, "adqsadas_orig.xpt")) DataFrame convert_blanks_to_missing
+adqscibc_orig = @chain readstat(joinpath(path, "adqscibc_orig.xpt")) DataFrame convert_blanks_to_missing
+adae_orig = @chain readstat(joinpath(path, "adae_orig.xpt")) DataFrame convert_blanks_to_missing
+adlbh = @chain readstat(joinpath(path, "adlbh.xpt")) DataFrame convert_blanks_to_missing
+adlbc = @chain readstat(joinpath(path, "adlbc.xpt")) DataFrame convert_blanks_to_missing
+adlbh_orig = @chain readstat(joinpath(path, "adlbh_orig.xpt")) DataFrame convert_blanks_to_missing
+adlbc_orig = @chain readstat(joinpath(path, "adlbc_orig.xpt")) DataFrame convert_blanks_to_missing
+adlbhy_orig = @chain readstat(joinpath(path, "adlbhy_orig.xpt")) DataFrame convert_blanks_to_missing
+
+```
+
+## TABLE 1
+
+</details>
+<details>
+<summary>Data Preparation - Table 1</summary>
+
+
+```{julia}
+adsl_prep = @chain adsl_orig begin
+    @transform :TRT01P = categorical(:TRT01P,
+        levels = ["Placebo", "Xanomeline Low Dose", "Xanomeline High Dose"],
+        ordered = true)
+    @transform :TRT01P = recode(:TRT01P,
+        "Xanomeline Low Dose" => "Low Dose",
+        "Xanomeline High Dose" => "High Dose")
+    
+    @select :USUBJID :TRT01P :ITTFL :SAFFL :EFFFL :COMP24FL :DCDECOD 
+
+end
+```
+
+</details>
+
+
+```{julia}
+#| echo: false
+tbl = table_one(
+    adsl_prep,
+    [:ITTFL => "INTENT-TO-TREAT", :SAFFL => "SAFETY", :EFFFL => "EFFICACY", :COMP24FL => "COMPLETE WEEK 24",:DCDECOD => "Complete Study" ],
+    groupby = :TRT01P => "XANOMELINE",
+    show_pvalues = true,
+    show_n = true
+)
+```
+
+## TABLE 2
+
+
+<details>
+<summary>Data Preparation - Table 2</summary>
+
+
+```{julia}
+adsl_prep = @chain adsl_orig begin
+    @transform :TRT01P = categorical(:TRT01P,
+        levels = ["Placebo", "Xanomeline Low Dose", "Xanomeline High Dose"],
+        ordered = true)
+    @transform :TRT01P = recode(:TRT01P,
+        "Xanomeline Low Dose" => "Low Dose",
+        "Xanomeline High Dose" => "High Dose")
+    
+    @rtransform :COMP24FL = ifelse(:COMP24FL == "Y", 
+        "Completed Week 24", 
+        ifelse(:COMP24FL == "N", "Early Termination (prior to Week 24)", missing))
+
+    @rtransform :DCDECOD = ifelse(:COMP24FL == "Completed Week 24" && :DCDECOD != "Complete",
+        "Completed", :DCDECOD)
+end
+```
+
+```{julia}
+dcdecod_map = Dict(
+    "Withdrawal By Subject" => "Subject decided to withdraw",
+    "Study Terminated By Sponsor" => "Sponsor decision",
+    "Physician Decision" => "Physician decided to withdraw subject",
+    "Protocol Violation" => missing
+)
+
+adsl = @chain adsl_orig begin
+    @rtransform :DCDECOD = get(dcdecod_map, titlecase(strip(:DCDECOD)), titlecase(strip(:DCDECOD)))
+end
+```
+
+```{julia}
+allowed_levels = [
+    "Adverse Event",
+    "Death",
+    "Lack Of Efficacy",
+    "Lost To Follow-Up",
+    "Subject decided to withdraw"
+]
+
+adsl = @chain adsl begin
+    @rtransform :DCDECOD = get(
+        Dict(
+            "Adverse Event" => "Adverse Event",
+            "Death" => "Death",
+            "Lack Of Efficacy" => "Lack Of Efficacy",
+            "Lost To Follow-Up" => "Lost To Follow-Up",
+            "Subject decided to withdraw" => "Subject decided to withdraw"
+        ),
+        :DCDECOD,
+        missing
+    )
+end
+
+adsl.DCDECOD = categorical(adsl.DCDECOD, levels=allowed_levels, ordered=true)
+```
+
+```{julia}
+p_loefl = @chain adsl begin
+    @rtransform :loefl = if ismissing(:DCDECOD)
+        0
+    else
+        :DCDECOD == "Lack Of Efficacy" ? 1 : 0
+    end
+    groupby(:TRT01P)
+    combine(_, :loefl => sum => :count)
+end
+```
+
+</details>
+
+
+```{julia}
+#| echo: false
+tbl1 = table_one(
+    adsl,
+    [:COMP24FL => "Completion Status",
+     :DCDECOD => "Reason for Early Termination (prior to Week 24)"],
+    groupby = :TRT01P => "XANOMELINE",
+    show_pvalues = true,
+    show_n = true
+)
+```
+
+
+## TABLE 3
+
+<details>
+<summary>Data Preparation - Table 3</summary>
+
+
+```{julia}
+adsl_l = @chain adsl_orig begin
+    @select :USUBJID :SITEGR1 :SITEID :TRT01P :ITTFL :EFFFL :COMP24FL
+    @transform :SITE = string(:SITEGR1, " — ", :SITEID)
+    stack(Not([:USUBJID, :SITEGR1, :SITEID, :TRT01P, :SITE]), variable_name = :DESC, value_name = :YN)
+    @rtransform :YN = :YN == "Y" ? 1 : 0
+    @rsubset :YN == 1
+    @rtransform :DESC = ifelse(:DESC == "ITTFL", "ITT",
+                         :DESC == "EFFFL" ? "Eff" :
+                         :DESC == "COMP24FL" ? "Com" : missing)
+end
+```
+
+
+
+```{julia}
+
+adsl_l = @chain adsl_orig begin
+    @select :SUBJID :SITEID :TRT01P :ITTFL :EFFFL :COMP24FL
+    @rtransform :SITE = string(:SITEID)
+    stack([:ITTFL, :EFFFL, :COMP24FL], 
+          [:SUBJID, :SITEID, :TRT01P, :SITE], 
+          variable_name = :DESC, value_name = :YN)
+
+    @rtransform :YN = :YN == "Y" ? 1 : 0
+    @rsubset :YN == 1
+
+    @rtransform :DESC = if :DESC == "ITTFL"
+        "ITT"
+    elseif :DESC == "EFFFL"
+        "Eff"
+    elseif :DESC == "COMP24FL"
+        "Com"
+    else
+        missing
+    end
+
+    @transform :DESC = categorical(:DESC, levels = ["ITT", "Eff", "Com"])
+    @transform :TRT01P = categorical(:TRT01P,
+        levels = ["Placebo", "Xanomeline Low Dose", "Xanomeline High Dose"],
+        ordered = true)
+    @transform :TRT01P = recode(:TRT01P,
+        "Xanomeline Low Dose" => "Low Dose",
+        "Xanomeline High Dose" => "High Dose")
+    
+end
+```
+
+</details>
+
+
+```{julia}
+#| echo: false
+tbl2 = table_one(
+    adsl_l,
+    :SITEID => "Pooled-SITEID",
+    groupby = [:TRT01P => "Dose", :DESC => "Desc"],
+    show_n = true
+)
+```
+
+## TABLE 4
+<details>
+<summary>Data Preparation - Table 4</summary>
+
+
+```{julia}
+adsl_demo = @chain adsl_orig begin
+    @transform :TRT01P = categorical(:TRT01P,
+        levels = ["Placebo", "Xanomeline Low Dose", "Xanomeline High Dose"],
+        ordered = true)
+    @transform :TRT01P = recode(:TRT01P,
+        "Xanomeline Low Dose" => "Low Dose",
+        "Xanomeline High Dose" => "High Dose")
+    @transform :SEX = recode(categorical(:SEX), "F" => "Female", "M" => "Male")
+    @transform :SEX = categorical(:SEX, levels = ["Female", "Male"], ordered = true)
+    @transform :AGEGR1 = recode(categorical(:AGEGR1),
+        "<65" => "<65 yrs",
+        "65-80" => "65-80 yrs",
+        ">80" => ">80 yrs")
+    @transform :RACE = titlecase.(strip.(:RACE))
+    @transform :BMIBLGR1 = categorical(:BMIBLGR1,
+        levels = ["<25", "25-<30", ">=30"], ordered = true)
+    @transform :DURDSGR1 = recode(categorical(:DURDSGR1),
+        "<12 Months" => "<12 months",
+        ">=12 Months" => ">=12 months")
+end
+```
+
+</details>
+
+
+```{julia}
+#| echo: false
+
+function custom_analysis(column)
+    (
+        length(column) => "n",
+        mean(column) => "Mean",
+        std(column) => "SD",
+        median(column) => "Median",
+        minimum(column) => "Min",
+        maximum(column) => "Max",
+    )
+end
+tbl_demo = table_one(
+    adsl_demo,
+    [
+        :AGE => custom_analysis => "Age (y)",
+        :AGEGR1 => "",
+        :SEX => "Sex",
+        :RACE => "Race (Origin)",
+        :MMSETOT => custom_analysis => "MMSE",
+        :DURDIS => custom_analysis => "Duration of disease",
+        :DURDSGR1 => "",
+        :BMIBL => "Baseline BMI",
+        :BMIBLGR1 => ""
+    ];
+    groupby = :TRT01P => "Treatment Arm",
+    show_total = true,
+    total_name = "Overall",
+    show_pvalues = true,
+    show_n = true
+)
+```
+
+
+
+
+## TABLE 5
+
+<details>
+<summary>Data Preparation - Table 5</summary>
+
+
+```{julia}
+adqsadas = @chain adqsadas_orig begin
+    @rsubset :EFFFL == "Y" && :ITTFL == "Y" && :PARAMCD == "ACTOT" && :ANL01FL == "Y"
+    @rsubset :AVISITN in (0, 24)
+    dropmissing(:CHG)
+    @transform :TRTP = recode(categorical(:TRTP),
+        "Xanomeline Low Dose" => "Low Dose",
+        "Xanomeline High Dose" => "High Dose"
+    )
+    @transform :TRTP = categorical(:TRTP, levels=["Placebo", "Low Dose", "High Dose"], ordered=true)
+end
+```
+
+
+</details>
+
+
+```{julia}
+#| echo: false
+
+tbl_sum = table_one(
+    adqsadas,
+    [
+        :BASE => "Baseline",
+        :AVAL => "Week 24",
+        :CHG => "Change from Baseline"
+    ];
+    groupby = :TRTP => "Treatment Arm",
+    show_total = true,
+    total_name = "Overall",
+    show_pvalues = true,
+    show_n = true,
+
+)
+```
+
+
+## TABLE 06
+
+<details>
+<summary>Data Preparation - Table 6</summary>
+
+
+
+```{julia}
+adqsadas_locf = @chain adqsadas_orig begin
+    @rsubset :EFFFL == "Y" && :ITTFL == "Y" && :PARAMCD == "ACTOT" && :ANL01FL == "Y"
+    @rsubset :AVISITN in (0, 8, 16, 24)
+    @select :USUBJID :TRTP :AVISIT :AVISITN :AVAL :BASE :CHG
+    @transform :SET = "LOCF"
+end
+```
+
+```{julia}
+adqsadas_win = @chain adqsadas_orig begin
+    @rsubset :EFFFL == "Y" && :ITTFL == "Y" && :PARAMCD == "ACTOT" && :ANL01FL == "Y"
+    @rsubset :AVISITN in (0, 8, 16, 24)
+    @rsubset :AVISITN != 0 && :DTYPE != "LOCF"
+    @select :USUBJID :TRTP :AVISIT :AVISITN :AVAL :BASE :CHG
+    @transform :SET = "Windowed"
+end
+```
+
+```{julia}
+adqsadas_l = @chain vcat(adqsadas_locf, adqsadas_win) begin
+    @rtransform :AVISIT_SET = if :AVISIT == "Baseline"
+        "Baseline"
+    else
+        string(:AVISIT, " (", :SET, ")")
+    end
+
+    @transform :AVISIT_SET = categorical(:AVISIT_SET,
+        levels = ["Baseline", 
+                  "Week 8 (Windowed)", "Week 16 (Windowed)", "Week 24 (Windowed)",
+                  "Week 8 (LOCF)", "Week 16 (LOCF)", "Week 24 (LOCF)"],
+        ordered = true)
+
+    @transform :TRTP = categorical(:TRTP,
+        levels = ["Placebo", "Xanomeline Low Dose", "Xanomeline High Dose"],
+        ordered = true)
+
+    @transform :TRTP = recode(:TRTP,
+        "Xanomeline Low Dose" => "Low Dose",
+        "Xanomeline High Dose" => "High Dose")
+end
+
+```
+
+```{julia}
+aval_long = stack(adqsadas_l, [:AVAL, :BASE, :CHG], variable_name = :VAR, value_name = :AVAL_VAL)
+aval_long = dropmissing(aval_long, :AVAL_VAL)
+
+```
+
+```{julia}
+function stats_summary(x)
+    NamedTuple{(:N, :Mean, :SD, :Median, :Min, :Max)}((
+        length(x),
+        mean(x),
+        std(x),
+        median(x),
+        minimum(x),
+        maximum(x)
+    ))
+end
+```
+
+```{julia}
+summary_long = @chain aval_long begin
+    groupby([:AVISIT_SET, :TRTP, :VAR])
+    combine(:AVAL_VAL => stats_summary => AsTable)
+end
+names(summary_long)
+
+```
+
+
+```{julia}
+stats = ["N", "Mean", "SD", "Median", "Min", "Max"]
+unstacked_stats = Dict()
+for stat in stats
+    stat_col = Symbol(stat)
+    df = select(summary_long, [:AVISIT_SET, :TRTP, :VAR, stat_col])
+    wide = unstack(df, [:AVISIT_SET, :TRTP], :VAR, stat_col)
+    
+    # Create a dictionary for renaming
+    old_names = Symbol.(names(wide)[3:end])
+    new_names = [Symbol("$(n)_$stat") for n in old_names]
+    rename_dict = Dict(zip(old_names, new_names))
+    
+    rename!(wide, rename_dict)
+    unstacked_stats[stat] = wide
+end
+wide_tbl = reduce((d1, d2) -> outerjoin(d1, d2, on=[:AVISIT_SET, :TRTP]), values(unstacked_stats))
+
+```
+
+</details>
+
+
+```{julia}
+#| echo: false
+
+tbl_demo1 = table_one(
+    wide_tbl,
+    [Symbol(col) => "" for col in names(wide_tbl) if col ∉ ["AVISIT_SET", "TRTP"]],
+    groupby = [:TRTP => "Treatment", :AVISIT_SET => "Visit"]
+)
+
+```
+
+## TABLE 7
+<details>
+<summary>Data Preparation - Table 7</summary>
+
+
+
+
+```{julia}
+adqscibc = @chain adqscibc_orig begin
+    @rsubset :EFFFL == "Y" && :ITTFL == "Y" && :AVISITN in (8, 16, 24) && :ANL01FL == "Y"
+    @select :USUBJID :TRTP :SITEGR1 :AVISIT :AVISITN :AVAL
+    @rtransform :AVALC = begin
+        val = string(:AVAL)
+        if val == "1"
+            "Marked improvement"
+        elseif val == "2"
+            "Moderate improvement"
+        elseif val == "3"
+            "Minimal improvement"
+        elseif val == "4"
+            "No Change"
+        elseif val == "5"
+            "Minimal worsening"
+        elseif val == "6"
+            "Moderate worsening"
+        elseif val == "7"
+            "Marked worsening"
+        else
+            missing
+        end
+    end
+end
+```
+
+```{julia}
+aval_labels = Dict(
+    1 => "Marked improvement",
+    2 => "Moderate improvement",
+    3 => "Minimal improvement",
+    4 => "No Change",
+    5 => "Minimal worsening",
+    6 => "Moderate worsening",
+    7 => "Marked worsening"
+)
+
+levels_order = [
+    "Marked improvement",
+    "Moderate improvement",
+    "Minimal improvement",
+    "No Change",
+    "Minimal worsening",
+    "Moderate worsening",
+    "Marked worsening"
+]
+
+adqscibc = @chain adqscibc begin
+    @rtransform :AVALC = get(aval_labels, :AVAL, missing)
+    @transform :AVALC = categorical(:AVALC, levels = levels_order, ordered = true)
+    
+    @transform :TRTP = recode(:TRTP,
+        "Xanomeline Low Dose" => "Low Dose",
+        "Xanomeline High Dose" => "High Dose")
+    
+    @transform :TRTP = categorical(:TRTP,
+        levels = ["Placebo", "Low Dose", "High Dose"])
+    
+    @transform :AVISIT = categorical(:AVISIT,
+        levels = ["Week 8", "Week 16", "Week 24"], ordered = true)
+end
+```
+
+</details>
+
+
+```{julia}
+#| echo: false
+
+tbl3 = summarytable(
+    adqscibc,
+    :AVAL => "Value",
+    rows = [:AVISIT => "VisitDay", :AVALC => "Assessment"],
+    cols = :TRTP => "Xanomeline",
+    summary = [
+        length => "N",
+    ]
+)
+```
+
+<details>
+<summary>Data Preparation - Table 8</summary>
+
+## TABLE 8
+
+
+```{julia}
+adsl_l = @chain adsl_orig begin
+    @rtransform :POP = if :COMP24FL == "Y" "COMP24FL" else missing end
+    @rtransform :POP = if :SAFFL == "Y" "SAFFL" else :POP end
+
+    @rsubset !ismissing(:POP)
+    @select :POP :USUBJID :TRT01P :AVGDD :CUMDOSE
+
+    @transform :TRT01P = categorical(:TRT01P,
+        levels = ["Placebo", "Xanomeline Low Dose", "Xanomeline High Dose"],
+        ordered = true)
+    @transform :TRT01P = recode(:TRT01P,
+        "Xanomeline Low Dose" => "Xanomeline<br>Low Dose",
+        "Xanomeline High Dose" => "Xanomeline<br>High Dose")
+    @rtransform :POP = if :POP == "COMP24FL"
+    elseif :POP == "SAFFL"
+    else
+        :POP
+    end
+end
+```
+
+```{julia}
+function summary_stats(col)
+    (
+        count(!ismissing, col) => "N",
+        mean(skipmissing(col)) => "Mean",
+        std(skipmissing(col)) => "SD",
+        median(skipmissing(col)) => "Median",
+        minimum(skipmissing(col)) => "Min",
+        maximum(skipmissing(col)) => "Max",
+    )
+end
+
+```
+
+```{julia}
+pop_labels = Dict(
+    "COMP24FL" => "**Completers at Week 24**<br>",
+    "SAFFL" => "**Safety Population**<br><small>Includes completers and early terminators</small>"
+)
+
+```
+
+</details>
+
+
+```{julia}
+#| echo: false
+
+tbls = map(unique(adsl_l.POP)) do pop_level
+    df = @chain adsl_l begin
+        @rsubset :POP == pop_level
+    end
+
+    table_one(
+        df,
+        [
+            :AVGDD => summary_stats => "Average daily dose (mg)",
+            :CUMDOSE => summary_stats => "Cumulative dose at end of study"
+        ],
+        groupby = [:TRT01P => "Treatment"],
+        show_n = true,
+        show_pvalues = false,
+        total_name = "Total"
+    )
+end
+
+# Merge the tables similar to `tbl_merge`
+tbl_exposure = vcat(tbls...)
+display(tbl_exposure[1])
+```
+
+<details>
+<summary>Data Preparation - Table 9</summary>
+
+## TABLE 9
+
+
+
+```{julia}
+adsl = @chain adsl_orig begin
+    @rsubset :SAFFL == "Y"
+    @rtransform :TRTA = replace(:TRT01A,
+        "Xanomeline Low Dose" => "Low Dose",
+        "Xanomeline High Dose" => "High Dose",
+        "Placebo" => "Placebo")
+    @transform :TRTA = categorical(:TRTA, levels=["Placebo", "Low Dose", "High Dose"], ordered=true)
+end
+```
+
+```{julia}
+adae = @chain adae_orig begin
+    @rsubset :SAFFL == "Y" && :TRTEMFL == "Y"
+    @rtransform :TRTA = replace(:TRTA,
+        "Xanomeline Low Dose" => "Low Dose",
+        "Xanomeline High Dose" => "High Dose",
+        "Placebo" => "Placebo")
+    @transform :TRTA = categorical(:TRTA, levels=["Placebo", "Low Dose", "High Dose"], ordered=true)
+    @rtransform :AETERM = titlecase(strip(:AETERM))
+    @rtransform :AEBODSYS = titlecase(strip(:AEBODSYS))
+end
+```
+
+```{julia}
+function complete_ae_data(df_adae, df_adsl; id_col=:USUBJID, soc_col=:AEBODSYS, ae_col=:AETERM, strata_col=:TRTA)
+    all_ids = unique(df_adsl[:, id_col])
+    levels_strata = levels(df_adsl[:, strata_col])
+    levels_soc = unique(df_adae[:, soc_col])
+    levels_ae = unique(df_adae[:, ae_col])
+
+    # Generate dummy combinations
+    rows = DataFrame()
+    for id in all_ids, soc in levels_soc, ae in levels_ae, trt in levels_strata
+        push!(rows, (USUBJID=id, AEBODSYS=soc, AETERM=ae, TRTA=trt))
+    end
+
+    # Mark those that are present in real ADAE
+    real_ids = select(df_adae, id_col, soc_col, ae_col, strata_col)
+    real_ids = unique(real_ids)
+    rename!(real_ids, Dict(id_col => :USUBJID, soc_col => :AEBODSYS, ae_col => :AETERM, strata_col => :TRTA))
+
+    merged = leftjoin(rows, real_ids, on=[:USUBJID, :AEBODSYS, :AETERM, :TRTA], indicator=:present)
+    merged.present = coalesce.(merged.present .== "both", false)
+    return merged
+end
+
+ae_cmpl = complete_ae_data(adae, adsl)
+```
+
+```{julia}
+ae_any = @chain adae begin
+    @rtransform :AEBODSYS = "Any Body System"
+    @rtransform :AETERM = "Any Body System"
+end
+
+ae_cmpl_any = complete_ae_data(ae_any, adsl)
+ae_all = vcat(ae_cmpl, ae_cmpl_any)
+```
+
+```{julia}
+ae_long = @chain ae_all begin
+    @rtransform :SOC = :AEBODSYS
+    @rtransform :AE = :AETERM
+    @rtransform :AE_Label = ifelse(:AEBODSYS == "Any Body System", "All " * :SOC, :AE)
+    @rtransform :PRESENT = :present
+    unique(:USUBJID)
+
+end
+```
+
+</details>
+
+
+
+```{julia}
+#| echo: false
+
+summary = table_one(
+    ae_long,
+    :AEBODSYS => "All any body system",
+    groupby = [:TRTA => "Xanomeline", :AETERM => ""],
+    show_n = true,
+    show_pvalues = true
+)
+```
+
+<details>
+<summary>Data Preparation - Table 10</summary>
+
+## TABLE 10
+
+
+
+
+```{julia}
+adlbc = @chain readstat(joinpath(path, "adlbc.xpt")) DataFrame begin
+    @rsubset :SAFFL == "Y" && (:AVISITN != 99 || (:AVISITN == 99 && :AENTMTFL == "Y"))
+end
+
+adlbh = @chain readstat(joinpath(path, "adlbh.xpt")) DataFrame begin
+    @rsubset :SAFFL == "Y" && (:AVISITN != 99 || (:AVISITN == 99 && :AENTMTFL == "Y"))
+    @rsubset !in(:PARAM, ["Anisocytes", "Poikilocytes", "Microcytes", "Macrocytes", "Polychromasia"])
+end
+```
+
+```{julia}
+adlbc2 = insertcols(copy(adlbc), :ORIG => fill("CHEMISTRY", nrow(adlbc)))
+adlbh2 = insertcols(copy(adlbh), :ORIG => fill("HEMATOLOGY", nrow(adlbh)))
+
+adlb = vcat(adlbc2, adlbh2)
+
+adlb = @chain adlb begin
+    @select :ORIG :PARCAT1 :PARAM :PARAMCD :USUBJID :TRTA :AVISIT :AVISITN :AVAL :CHG
+    @transform :TRTA = recode(categorical(:TRTA),
+        "Xanomeline Low Dose" => "Low Dose",
+        "Xanomeline High Dose" => "High Dose"
+    )
+    @transform :TRTA = categorical(:TRTA, levels = ["Placebo", "Low Dose", "High Dose"], ordered = true)
+    @transform :AVISIT = strip.(String.(:AVISIT))  
+end
+```
+
+```{julia}
+adlb_l = stack(adlb, [:AVAL, :CHG], variable_name = :VARIABLE, value_name = :VALUE)
+```
+
+```{julia}
+group_vars = [:ORIG, :PARCAT1, :PARAM, :PARAMCD, :AVISIT, :AVISITN, :VARIABLE]
+adlb_n = groupby(adlb_l, group_vars)
+```
+
+```{julia}
+function custom_lab_summary(x)
+    data = collect(skipmissing(x))
+    if isempty(data)
+        return (
+            0 => "n",
+            missing => "Mean",
+            missing => "SD",
+            missing => "Median",
+            missing => "Min",
+            missing => "Max"
+        )
+    else
+        return (
+            length(data) => "n",
+            mean(data) => "Mean",
+            std(data) => "SD",
+            median(data) => "Median",
+            minimum(data) => "Min",
+            maximum(data) => "Max"
+        )
+    end
+end
+
+```
+
+```{julia}
+group_vars = [:PARAM, :AVISIT, :TRTA, :VARIABLE]
+
+adlb_summary = @chain adlb_l begin
+    groupby(group_vars)
+    @combine begin
+        :N = count(!ismissing, :VALUE)
+        :Mean = mean(skipmissing(:VALUE))
+        :SD = std(skipmissing(:VALUE))
+    end
+end
+```
+
+```{julia}
+adlb_summary_long = stack(
+    adlb_summary,
+    [:N, :Mean, :SD],
+    variable_name = :SummaryType,
+    value_name = :VALUE
+)
+```
+
+```{julia}
+adlb_summary_long1 = @chain adlb_summary_long begin
+    @transform :VALUE = replace(:VALUE, NaN=>missing)
+    dropmissing
+end
+```
+
+```{julia}
+adlb_summary_long2 = combine(groupby(adlb_summary_long1,[:VARIABLE])) do df
+    if all(x -> x == "CHG", df.VARIABLE)
+        df = @rsubset df :SummaryType == "Mean"
+    else 
+        df = df
+    end
+end
+```
+
+```{julia}
+adlb_summary_long3 = @chain adlb_summary_long2 begin
+   @rtransform :SummaryType = (:VARIABLE == "CHG") ? "CHG" : :SummaryType
+   @rtransform :VARIABLE = (:VARIABLE == "CHG") ? "AVAL" : :VARIABLE
+end
+```
+
+</details>
+
+
+```{julia}
+#| echo: false
+
+tbl_summary = listingtable(
+    adlb_summary_long3,
+    :VALUE,
+    rows = [:PARAM => "", :AVISIT => ""],
+    cols = [:TRTA => "Treatment", :SummaryType => ""]
+)
+```
+
+<details>
+<summary>Data Preparation - Table 11</summary>
+
+## TABLE 11
+
+
+```{julia}
+
+adlbc2 = insertcols(copy(adlbc), :ORIG => fill("CHEMISTRY", nrow(adlbc)))
+adlbh2 = insertcols(copy(adlbh), :ORIG => fill("HEMATOLOGY", nrow(adlbh)))
+adlb = vcat(adlbc2, adlbh2)
+
+adlb = @chain adlb begin
+    @rsubset coalesce(:SAFFL == "Y", false) &&
+             coalesce(:ANL01FL == "Y", false) &&
+             coalesce(:AVISITN != 99, false) &&
+             !ismissing(:PARAM) &&
+             !ismissing(:TRTA) &&
+             !ismissing(:LBNRIND) &&
+             :LBNRIND in ["LOW", "NORMAL", "HIGH"] &&
+             (!ismissing(:PARAMCD) && !coalesce(startswith(:PARAMCD, "_"), false))
+    @select :ORIG :PARCAT1 :PARAM :PARAMCD :USUBJID :TRTA :AVISIT :AVISITN :AVAL :CHG :LBNRIND
+    @transform :TRTA = recode(categorical(:TRTA),
+        "Xanomeline Low Dose" => "Low Dose",
+        "Xanomeline High Dose" => "High Dose"
+    )
+    @transform :TRTA = categorical(:TRTA, levels = ["Placebo", "Low Dose", "High Dose"], ordered = true)
+    @transform :LBNRIND = recode(categorical(:LBNRIND),
+                    "LOW" => "Low",
+                    "NORMAL" => "Normal",
+                    "HIGH" => "High")
+    @rtransform :PARAM = replace(:PARAM, r"\(.*?\)" => "") |> strip
+end
+```
+
+```{julia}
+adlb_cross = @chain adlb begin
+    groupby([:ORIG, :PARAM, :TRTA, :LBNRIND])
+    @combine :N = length(:LBNRIND)
+    unstack(:LBNRIND, :N, fill=0)
+    @rtransform :Total = coalesce(:Low, 0) + coalesce(:Normal, 0) + coalesce(:High, 0)
+    @rtransform :LowP = round(100 * coalesce(:Low, 0) / :Total, digits=1)
+    @rtransform :NormalP = round(100 * coalesce(:Normal, 0) / :Total, digits=1)
+    @rtransform :HighP = round(100 * coalesce(:High, 0) / :Total, digits=1)
+end
+```
+
+```{julia}
+adlb_summary = @chain adlb begin
+    groupby([:ORIG, :TRTA, :LBNRIND, :PARAM])
+    @combine :N = length(:LBNRIND)
+    unstack(:LBNRIND, :N, fill=0)
+    @rtransform :Total = coalesce(:Low, 0) + coalesce(:Normal, 0) + coalesce(:High, 0)
+end
+```
+
+```{julia}
+tbl_final = @chain adlb_summary begin
+    select(:ORIG, :TRTA, :PARAM, :Low, :Normal, :High, :Total)
+    stack([:Low, :Normal, :High], variable_name = :Category, value_name = :Count)
+    @rtransform :Percent = if :Total > 0
+        string(:Count, " (", round(100 * :Count / :Total, digits=1), "%)")
+    else
+        "0 (0%)"
+    end
+end
+```
+
+</details>
+
+
+```{julia}
+#| echo: false
+
+tbl4 = listingtable(
+    tbl_final,
+    :Percent,
+    rows = [:ORIG => "", :PARAM => ""],
+    cols = [:TRTA => "Treatment", :Category => "Lab Status"]
+)
+```
+
+
+<details>
+<summary>Data Preparation - Table 12</summary>
+
+## TABLE 12
+
+
+```{julia}
+adlbc2 = insertcols(copy(adlbc), :ORIG => fill("CHEMISTRY", nrow(adlbc)))
+adlbh2 = insertcols(copy(adlbh), :ORIG => fill("HEMATOLOGY", nrow(adlbh)))
+adlb = vcat(adlbc2, adlbh2)
+
+```
+
+```{julia}
+lab_keep = ["Alanine Aminotransferase", "Albumin", "Basophils", "Eosinophils"]
+
+adlb1 = @chain adlb begin
+    @transform :PARAM = strip.(replace.(string.(:PARAM), r"\(.*?\)" => ""))
+    @rsubset :SAFFL == "Y" &&
+             :AVISITN != 99 &&
+             strip(:VISIT) != "SCREENING 1" &&
+             !ismissing(:VISIT) && !ismissing(:TRTA) &&
+             !ismissing(:BNRIND) && !ismissing(:ANRIND) &&
+             !ismissing(:PARAM) && !startswith(:PARAMCD, "_") &&
+             :PARAM in lab_keep
+
+
+    @transform :TRTP = recode(categorical(:TRTP),
+        "Placebo" => "Placebo",
+        "Xanomeline Low Dose" => "Low Dose",
+        "Xanomeline High Dose" => "High Dose"
+    )
+    @transform :TRTP = categorical(:TRTP, levels=["Placebo", "Low Dose", "High Dose"], ordered=true)
+    @transform :ANRIND = recode(categorical(:ANRIND),
+        "N" => "Normal", "H" => "High")
+    @transform :BNRIND = recode(categorical(:BNRIND),
+        "N" => "Normal", "H" => "High")
+    @rtransform :PARAM = replace(:PARAM, r"\(.*?\)" => "") |> strip
+end
+```
+
+```{julia}
+group_vars = [:ORIG, :PARAM, :PARAMCD, :TRTP, :VISIT]
+adlb_groups = groupby(adlb1, group_vars)
+```
+
+```{julia}
+function shift_table(df)
+    tbl = @chain df begin
+        groupby([:BNRIND, :ANRIND])
+        @combine :Count = length(:BNRIND)
+        unstack(:ANRIND, :Count, fill=0, allowmissing=true)
+        @transform :RowLabel = string(:BNRIND)
+    end
+    return select(tbl, :RowLabel, Not(:BNRIND))
+end
+```
+
+```{julia}
+using Tables
+
+shifts_df = combine(adlb_groups) do sdf
+    tbl = shift_table(sdf)
+    (; ORIG = [first(sdf.ORIG)],
+       PARAM = [first(sdf.PARAM)],
+       PARAMCD = [first(sdf.PARAMCD)],
+       TRTP = [first(sdf.TRTP)],
+       VISIT = [first(sdf.VISIT)],
+       table = [tbl]) 
+end
+```
+
+```{julia}
+rows = eachrow(shifts_df)
+tables_list = map(rows) do row
+    inner_tbl = deepcopy(row.table)
+    insertcols!(inner_tbl, 1,
+        :ORIG => row.ORIG,
+        :PARAM => row.PARAM,
+        :PARAMCD => row.PARAMCD,
+        :TRTP => row.TRTP,
+        :VISIT => row.VISIT
+    )
+    inner_tbl
+end
+shifts_long = vcat(tables_list...; cols = :union)
+```
+
+```{julia}
+tbl_final = @chain shifts_long begin
+    stack(Not([:ORIG, :PARAM, :PARAMCD, :TRTP, :VISIT, :RowLabel]),
+          variable_name=:ShiftTo, value_name=:Count)
+    @rtransform :Percent = ismissing(:Count) ? "0 (0%)" :
+                        (:Count == 0 ? "0 (0%)" :
+                        string(:Count, " (", round(100 * :Count / sum(skipmissing(:Count)), digits=1), "%)"))
+    select(:ORIG, :PARAM, :TRTP, :VISIT, :RowLabel, :ShiftTo, :Percent)
+end
+```
+
+```{julia}
+tbl_final_cleaned = @chain shifts_long begin
+    stack(Not([:ORIG, :PARAM, :PARAMCD, :TRTP, :VISIT, :RowLabel]),
+          variable_name = :ShiftTo, value_name = :Count)
+    @rsubset(:ShiftTo in ["High", "Normal"])
+    @rtransform :Percent = ismissing(:Count) ? "0 (0%)" :
+        (:Count == 0 ? "0 (0%)" :
+        string(:Count, " (", round(100 * :Count / sum(skipmissing(:Count)), digits = 1), "%)"))
+    @select :ORIG :PARAM :TRTP :VISIT :ShiftTo :Percent
+end
+```
+
+```{julia}
+tbl_f = @chain tbl_final_cleaned begin
+    groupby([:ORIG, :PARAM, :TRTP, :VISIT, :ShiftTo])
+    combine(_) do sdf
+        sdf[1, :] 
+    end
+end
+```
+
+</details>
+
+
+```{julia}
+#| echo: false
+
+tbl5 = listingtable(
+    tbl_f,
+    :Percent,
+    rows = [:ORIG => "", :PARAM => "", :VISIT => ""],
+    rowgaps = [i => 6.0 for i = 1:40],
+    cols = [:TRTP => "Treatment", :ShiftTo => ""]
+)
+```
+

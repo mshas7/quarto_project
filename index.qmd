@@ -1,0 +1,12 @@
+---
+title: "Welcome"
+format: html
+---
+
+# Welcome to the NCA Report Site
+
+This site contains the rendered NCA datasets and summary tables for:
+
+- [CDISCPILOT NCA](Scripts/ADNCA-dataprep.qmd)
+- [DAPA01 NCA](Scripts/admiral-summarytables.qmd)
+- [Summary statistics and tables](Scripts/admiral-summarytables.qmd)
