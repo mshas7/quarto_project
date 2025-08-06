@@ -1,4 +1,6 @@
 ---
+title: "Summary statistics and tables"
+author: "Mohammed Shas"
 julia:
     execflags: 
       - "--project=."
@@ -31,7 +33,7 @@ include("con-fun.jl")
 ## Read the datasets
 
 ```{julia}
-path = "C:\\quarto_website\\quarto_project\\Datasets"
+path = joinpath(@__DIR__, "..", "Datasets") |> normpath
 pc = @chain readstat(joinpath(path, "pc.xpt")) DataFrame convert_blanks_to_missing
 ex = @chain readstat(joinpath(path, "ex.xpt")) DataFrame convert_blanks_to_missing
 vs = @chain readstat(joinpath(path, "vs.xpt")) DataFrame convert_blanks_to_missing
@@ -109,6 +111,10 @@ adsl_prep = @chain adsl_orig begin
 end
 ```
 
+</details>
+<details>
+<summary>Data wrangling</summary>
+
 ```{julia}
 dcdecod_map = Dict(
     "Withdrawal By Subject" => "Subject decided to withdraw",
@@ -121,6 +127,11 @@ adsl = @chain adsl_orig begin
     @rtransform :DCDECOD = get(dcdecod_map, titlecase(strip(:DCDECOD)), titlecase(strip(:DCDECOD)))
 end
 ```
+
+</details>
+<details>
+<summary>Data wrangling</summary>
+
 
 ```{julia}
 allowed_levels = [
@@ -147,6 +158,12 @@ end
 
 adsl.DCDECOD = categorical(adsl.DCDECOD, levels=allowed_levels, ordered=true)
 ```
+
+
+</details>
+<details>
+<summary>Data wrangling</summary>
+
 
 ```{julia}
 p_loefl = @chain adsl begin
@@ -194,6 +211,11 @@ adsl_l = @chain adsl_orig begin
                          :DESC == "COMP24FL" ? "Com" : missing)
 end
 ```
+
+</details>
+<details>
+<summary>Data wrangling</summary>
+
 
 
 
@@ -370,6 +392,10 @@ adqsadas_locf = @chain adqsadas_orig begin
 end
 ```
 
+</details>
+<details>
+<summary>Data wrangling</summary>
+
 ```{julia}
 adqsadas_win = @chain adqsadas_orig begin
     @rsubset :EFFFL == "Y" && :ITTFL == "Y" && :PARAMCD == "ACTOT" && :ANL01FL == "Y"
@@ -379,6 +405,10 @@ adqsadas_win = @chain adqsadas_orig begin
     @transform :SET = "Windowed"
 end
 ```
+
+</details>
+<details>
+<summary>Data wrangling</summary>
 
 ```{julia}
 adqsadas_l = @chain vcat(adqsadas_locf, adqsadas_win) begin
@@ -405,11 +435,19 @@ end
 
 ```
 
+</details>
+<details>
+<summary>Data wrangling</summary>
+
 ```{julia}
 aval_long = stack(adqsadas_l, [:AVAL, :BASE, :CHG], variable_name = :VAR, value_name = :AVAL_VAL)
 aval_long = dropmissing(aval_long, :AVAL_VAL)
 
 ```
+
+</details>
+<details>
+<summary>Data wrangling</summary>
 
 ```{julia}
 function stats_summary(x)
@@ -424,6 +462,10 @@ function stats_summary(x)
 end
 ```
 
+</details>
+<details>
+<summary>Data wrangling</summary>
+
 ```{julia}
 summary_long = @chain aval_long begin
     groupby([:AVISIT_SET, :TRTP, :VAR])
@@ -432,6 +474,10 @@ end
 names(summary_long)
 
 ```
+
+</details>
+<details>
+<summary>Data wrangling</summary>
 
 
 ```{julia}
@@ -502,6 +548,10 @@ adqscibc = @chain adqscibc_orig begin
 end
 ```
 
+</details>
+<details>
+<summary>Data wrangling</summary>
+
 ```{julia}
 aval_labels = Dict(
     1 => "Marked improvement",
@@ -556,10 +606,11 @@ tbl3 = summarytable(
 )
 ```
 
+
+## TABLE 8
 <details>
 <summary>Data Preparation - Table 8</summary>
 
-## TABLE 8
 
 
 ```{julia}
@@ -584,6 +635,10 @@ adsl_l = @chain adsl_orig begin
 end
 ```
 
+</details>
+<details>
+<summary>Data wrangling</summary>
+
 ```{julia}
 function summary_stats(col)
     (
@@ -597,6 +652,10 @@ function summary_stats(col)
 end
 
 ```
+
+</details>
+<details>
+<summary>Data wrangling</summary>
 
 ```{julia}
 pop_labels = Dict(
@@ -635,10 +694,10 @@ tbl_exposure = vcat(tbls...)
 display(tbl_exposure[1])
 ```
 
-<details>
-<summary>Data Preparation - Table 9</summary>
 
 ## TABLE 9
+<details>
+<summary>Data Preparation - Table 9</summary>
 
 
 
@@ -653,6 +712,10 @@ adsl = @chain adsl_orig begin
 end
 ```
 
+</details>
+<details>
+<summary>Data wrangling</summary>
+
 ```{julia}
 adae = @chain adae_orig begin
     @rsubset :SAFFL == "Y" && :TRTEMFL == "Y"
@@ -665,6 +728,10 @@ adae = @chain adae_orig begin
     @rtransform :AEBODSYS = titlecase(strip(:AEBODSYS))
 end
 ```
+
+</details>
+<details>
+<summary>Data wrangling</summary>
 
 ```{julia}
 function complete_ae_data(df_adae, df_adsl; id_col=:USUBJID, soc_col=:AEBODSYS, ae_col=:AETERM, strata_col=:TRTA)
@@ -692,6 +759,10 @@ end
 ae_cmpl = complete_ae_data(adae, adsl)
 ```
 
+</details>
+<details>
+<summary>Data wrangling</summary>
+
 ```{julia}
 ae_any = @chain adae begin
     @rtransform :AEBODSYS = "Any Body System"
@@ -701,6 +772,10 @@ end
 ae_cmpl_any = complete_ae_data(ae_any, adsl)
 ae_all = vcat(ae_cmpl, ae_cmpl_any)
 ```
+
+</details>
+<details>
+<summary>Data wrangling</summary>
 
 ```{julia}
 ae_long = @chain ae_all begin
@@ -729,10 +804,10 @@ summary = table_one(
 )
 ```
 
-<details>
-<summary>Data Preparation - Table 10</summary>
 
 ## TABLE 10
+<details>
+<summary>Data Preparation - Table 10</summary>
 
 
 
@@ -747,6 +822,10 @@ adlbh = @chain readstat(joinpath(path, "adlbh.xpt")) DataFrame begin
     @rsubset !in(:PARAM, ["Anisocytes", "Poikilocytes", "Microcytes", "Macrocytes", "Polychromasia"])
 end
 ```
+
+</details>
+<details>
+<summary>Data wrangling</summary>
 
 ```{julia}
 adlbc2 = insertcols(copy(adlbc), :ORIG => fill("CHEMISTRY", nrow(adlbc)))
@@ -765,14 +844,26 @@ adlb = @chain adlb begin
 end
 ```
 
+</details>
+<details>
+<summary>Data wrangling</summary>
+
 ```{julia}
 adlb_l = stack(adlb, [:AVAL, :CHG], variable_name = :VARIABLE, value_name = :VALUE)
 ```
+
+</details>
+<details>
+<summary>Data wrangling</summary>
 
 ```{julia}
 group_vars = [:ORIG, :PARCAT1, :PARAM, :PARAMCD, :AVISIT, :AVISITN, :VARIABLE]
 adlb_n = groupby(adlb_l, group_vars)
 ```
+
+</details>
+<details>
+<summary>Data wrangling</summary>
 
 ```{julia}
 function custom_lab_summary(x)
@@ -800,6 +891,10 @@ end
 
 ```
 
+</details>
+<details>
+<summary>Data wrangling</summary>
+
 ```{julia}
 group_vars = [:PARAM, :AVISIT, :TRTA, :VARIABLE]
 
@@ -813,6 +908,10 @@ adlb_summary = @chain adlb_l begin
 end
 ```
 
+</details>
+<details>
+<summary>Data wrangling</summary>
+
 ```{julia}
 adlb_summary_long = stack(
     adlb_summary,
@@ -822,12 +921,21 @@ adlb_summary_long = stack(
 )
 ```
 
+</details>
+<details>
+<summary>Data wrangling</summary>
+
 ```{julia}
 adlb_summary_long1 = @chain adlb_summary_long begin
     @transform :VALUE = replace(:VALUE, NaN=>missing)
     dropmissing
 end
 ```
+
+</details>
+<details>
+<summary>Data wrangling</summary>
+
 
 ```{julia}
 adlb_summary_long2 = combine(groupby(adlb_summary_long1,[:VARIABLE])) do df
@@ -838,6 +946,10 @@ adlb_summary_long2 = combine(groupby(adlb_summary_long1,[:VARIABLE])) do df
     end
 end
 ```
+
+</details>
+<details>
+<summary>Data wrangling</summary>
 
 ```{julia}
 adlb_summary_long3 = @chain adlb_summary_long2 begin
@@ -860,10 +972,10 @@ tbl_summary = listingtable(
 )
 ```
 
+## TABLE 11
 <details>
 <summary>Data Preparation - Table 11</summary>
 
-## TABLE 11
 
 
 ```{julia}
@@ -895,6 +1007,10 @@ adlb = @chain adlb begin
 end
 ```
 
+</details>
+<details>
+<summary>Data wrangling</summary>
+
 ```{julia}
 adlb_cross = @chain adlb begin
     groupby([:ORIG, :PARAM, :TRTA, :LBNRIND])
@@ -907,6 +1023,10 @@ adlb_cross = @chain adlb begin
 end
 ```
 
+</details>
+<details>
+<summary>Data wrangling</summary>
+
 ```{julia}
 adlb_summary = @chain adlb begin
     groupby([:ORIG, :TRTA, :LBNRIND, :PARAM])
@@ -915,6 +1035,10 @@ adlb_summary = @chain adlb begin
     @rtransform :Total = coalesce(:Low, 0) + coalesce(:Normal, 0) + coalesce(:High, 0)
 end
 ```
+
+</details>
+<details>
+<summary>Data wrangling</summary>
 
 ```{julia}
 tbl_final = @chain adlb_summary begin
@@ -943,10 +1067,10 @@ tbl4 = listingtable(
 ```
 
 
-<details>
-<summary>Data Preparation - Table 12</summary>
 
 ## TABLE 12
+<details>
+<summary>Data Preparation - Table 12</summary>
 
 
 ```{julia}
@@ -955,6 +1079,10 @@ adlbh2 = insertcols(copy(adlbh), :ORIG => fill("HEMATOLOGY", nrow(adlbh)))
 adlb = vcat(adlbc2, adlbh2)
 
 ```
+
+</details>
+<details>
+<summary>Data wrangling</summary>
 
 ```{julia}
 lab_keep = ["Alanine Aminotransferase", "Albumin", "Basophils", "Eosinophils"]
@@ -984,10 +1112,18 @@ adlb1 = @chain adlb begin
 end
 ```
 
+</details>
+<details>
+<summary>Data wrangling</summary>
+
 ```{julia}
 group_vars = [:ORIG, :PARAM, :PARAMCD, :TRTP, :VISIT]
 adlb_groups = groupby(adlb1, group_vars)
 ```
+
+</details>
+<details>
+<summary>Data wrangling</summary>
 
 ```{julia}
 function shift_table(df)
@@ -1000,6 +1136,11 @@ function shift_table(df)
     return select(tbl, :RowLabel, Not(:BNRIND))
 end
 ```
+
+</details>
+<details>
+<summary>Data wrangling</summary>
+
 
 ```{julia}
 using Tables
@@ -1014,6 +1155,10 @@ shifts_df = combine(adlb_groups) do sdf
        table = [tbl]) 
 end
 ```
+
+</details>
+<details>
+<summary>Data wrangling</summary>
 
 ```{julia}
 rows = eachrow(shifts_df)
@@ -1031,6 +1176,12 @@ end
 shifts_long = vcat(tables_list...; cols = :union)
 ```
 
+</details>
+<details>
+<summary>Data wrangling</summary>
+
+
+
 ```{julia}
 tbl_final = @chain shifts_long begin
     stack(Not([:ORIG, :PARAM, :PARAMCD, :TRTP, :VISIT, :RowLabel]),
@@ -1041,6 +1192,10 @@ tbl_final = @chain shifts_long begin
     select(:ORIG, :PARAM, :TRTP, :VISIT, :RowLabel, :ShiftTo, :Percent)
 end
 ```
+
+</details>
+<details>
+<summary>Data wrangling</summary>
 
 ```{julia}
 tbl_final_cleaned = @chain shifts_long begin
@@ -1053,6 +1208,10 @@ tbl_final_cleaned = @chain shifts_long begin
     @select :ORIG :PARAM :TRTP :VISIT :ShiftTo :Percent
 end
 ```
+
+</details>
+<details>
+<summary>Data wrangling</summary>
 
 ```{julia}
 tbl_f = @chain tbl_final_cleaned begin

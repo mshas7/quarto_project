@@ -22,5 +22,11 @@
   },
   "Scripts/ADNCA-dataprep.qmd": {
     "ADNCA-dataprep.html": "12fb7a6b"
+  },
+  "Scripts/CDISCPILOT.qmd": {
+    "CDISCPILOT.html": "bf8dc7f2"
+  },
+  "Scripts/DAPA01.qmd": {
+    "DAPA01.html": "a49cba7d"
   }
 }

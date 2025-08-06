@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Mohammed Shas">
 
-<title>admiral-summarytables – NCA Analysis Website</title>
+<title>Summary statistics and tables – NCA Analysis Website</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -167,9 +168,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Summary statistics and tables</h1>
+</div>
 
 
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Mohammed Shas </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
 
 
 <details>
@@ -203,7 +226,7 @@ Data Loading
 <section id="read-the-datasets" class="level2">
 <h2 class="anchored" data-anchor-id="read-the-datasets">Read the datasets</h2>
 <div id="4" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>path <span class="op">=</span> <span class="st">"C:</span><span class="sc">\\</span><span class="st">quarto_website</span><span class="sc">\\</span><span class="st">quarto_project</span><span class="sc">\\</span><span class="st">Datasets"</span></span>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>path <span class="op">=</span> <span class="fu">joinpath</span>(<span class="pp">@__DIR__</span>, <span class="st">".."</span>, <span class="st">"Datasets"</span>) <span class="op">|&gt;</span> normpath</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>pc <span class="op">=</span> <span class="pp">@chain</span> <span class="fu">readstat</span>(<span class="fu">joinpath</span>(path, <span class="st">"pc.xpt"</span>)) DataFrame convert_blanks_to_missing</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>ex <span class="op">=</span> <span class="pp">@chain</span> <span class="fu">readstat</span>(<span class="fu">joinpath</span>(path, <span class="st">"ex.xpt"</span>)) DataFrame convert_blanks_to_missing</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>vs <span class="op">=</span> <span class="pp">@chain</span> <span class="fu">readstat</span>(<span class="fu">joinpath</span>(path, <span class="st">"vs.xpt"</span>)) DataFrame convert_blanks_to_missing</span>
@@ -3525,6 +3548,11 @@ Data Preparation - Table 2
 </div>
 </div>
 </div>
+</details>
+<details>
+<summary>
+Data wrangling
+</summary>
 <div id="12" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>dcdecod_map <span class="op">=</span> <span class="fu">Dict</span>(</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Withdrawal By Subject"</span> <span class="op">=&gt;</span> <span class="st">"Subject decided to withdraw"</span>,</span>
@@ -4975,6 +5003,11 @@ Data Preparation - Table 2
 </div>
 </div>
 </div>
+</details>
+<details>
+<summary>
+Data wrangling
+</summary>
 <div id="14" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>allowed_levels <span class="op">=</span> [</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Adverse Event"</span>,</span>
@@ -5023,6 +5056,11 @@ Data Preparation - Table 2
  "Lack Of Efficacy"</code></pre>
 </div>
 </div>
+</details>
+<details>
+<summary>
+Data wrangling
+</summary>
 <div id="16" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>p_loefl <span class="op">=</span> <span class="pp">@chain</span> adsl <span class="cf">begin</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@rtransform</span> <span class="op">:</span>loefl <span class="op">=</span> <span class="cf">if</span> <span class="fu">ismissing</span>(<span class="op">:</span>DCDECOD)</span>
@@ -5523,6 +5561,11 @@ Data Preparation - Table 3
 </div>
 </div>
 </div>
+</details>
+<details>
+<summary>
+Data wrangling
+</summary>
 <div id="22" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>adsl_l <span class="op">=</span> <span class="pp">@chain</span> adsl_orig <span class="cf">begin</span></span>
@@ -9751,6 +9794,11 @@ Data Preparation - Table 6
 </div>
 </div>
 </div>
+</details>
+<details>
+<summary>
+Data wrangling
+</summary>
 <div id="36" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>adqsadas_win <span class="op">=</span> <span class="pp">@chain</span> adqsadas_orig <span class="cf">begin</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@rsubset</span> <span class="op">:</span>EFFFL <span class="op">==</span> <span class="st">"Y"</span> <span class="op">&amp;&amp;</span> <span class="op">:</span>ITTFL <span class="op">==</span> <span class="st">"Y"</span> <span class="op">&amp;&amp;</span> <span class="op">:</span>PARAMCD <span class="op">==</span> <span class="st">"ACTOT"</span> <span class="op">&amp;&amp;</span> <span class="op">:</span>ANL01FL <span class="op">==</span> <span class="st">"Y"</span></span>
@@ -9792,6 +9840,11 @@ Data Preparation - Table 6
 </div>
 </div>
 </div>
+</details>
+<details>
+<summary>
+Data wrangling
+</summary>
 <div id="38" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>adqsadas_l <span class="op">=</span> <span class="pp">@chain</span> <span class="fu">vcat</span>(adqsadas_locf, adqsadas_win) <span class="cf">begin</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@rtransform</span> <span class="op">:</span>AVISIT_SET <span class="op">=</span> <span class="cf">if</span> <span class="op">:</span>AVISIT <span class="op">==</span> <span class="st">"Baseline"</span></span>
@@ -10161,6 +10214,11 @@ Data Preparation - Table 6
 </div>
 </div>
 </div>
+</details>
+<details>
+<summary>
+Data wrangling
+</summary>
 <div id="40" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>aval_long <span class="op">=</span> <span class="fu">stack</span>(adqsadas_l, [<span class="op">:</span>AVAL, <span class="op">:</span>BASE, <span class="op">:</span>CHG], variable_name <span class="op">=</span> <span class="op">:</span>VAR, value_name <span class="op">=</span> <span class="op">:</span>AVAL_VAL)</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>aval_long <span class="op">=</span> <span class="fu">dropmissing</span>(aval_long, <span class="op">:</span>AVAL_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -10483,6 +10541,11 @@ Data Preparation - Table 6
 </div>
 </div>
 </div>
+</details>
+<details>
+<summary>
+Data wrangling
+</summary>
 <div id="42" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">stats_summary</span>(x)</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">NamedTuple</span><span class="dt">{(:N, :Mean, :SD, :Median, :Min, :Max)}</span>((</span>
@@ -10498,6 +10561,11 @@ Data Preparation - Table 6
 <pre><code>stats_summary (generic function with 1 method)</code></pre>
 </div>
 </div>
+</details>
+<details>
+<summary>
+Data wrangling
+</summary>
 <div id="44" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>summary_long <span class="op">=</span> <span class="pp">@chain</span> aval_long <span class="cf">begin</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">groupby</span>([<span class="op">:</span>AVISIT_SET, <span class="op">:</span>TRTP, <span class="op">:</span>VAR])</span>
@@ -10517,6 +10585,11 @@ Data Preparation - Table 6
  "Max"</code></pre>
 </div>
 </div>
+</details>
+<details>
+<summary>
+Data wrangling
+</summary>
 <div id="46" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>stats <span class="op">=</span> [<span class="st">"N"</span>, <span class="st">"Mean"</span>, <span class="st">"SD"</span>, <span class="st">"Median"</span>, <span class="st">"Min"</span>, <span class="st">"Max"</span>]</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>unstacked_stats <span class="op">=</span> <span class="fu">Dict</span>()</span>
@@ -12225,6 +12298,11 @@ Data Preparation - Table 7
 </div>
 </div>
 </div>
+</details>
+<details>
+<summary>
+Data wrangling
+</summary>
 <div id="52" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>aval_labels <span class="op">=</span> <span class="fu">Dict</span>(</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    <span class="fl">1</span> <span class="op">=&gt;</span> <span class="st">"Marked improvement"</span>,</span>
@@ -12718,13 +12796,13 @@ Data Preparation - Table 7
 </tbody></table>
 </div>
 </div>
+</section>
+<section id="table-8" class="level2">
+<h2 class="anchored" data-anchor-id="table-8">TABLE 8</h2>
 <details>
 <summary>
 Data Preparation - Table 8
 </summary>
-</details></section>
-<section id="table-8" class="level2">
-<h2 class="anchored" data-anchor-id="table-8">TABLE 8</h2>
 <div id="56" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>adsl_l <span class="op">=</span> <span class="pp">@chain</span> adsl_orig <span class="cf">begin</span></span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@rtransform</span> <span class="op">:</span>POP <span class="op">=</span> <span class="cf">if</span> <span class="op">:</span>COMP24FL <span class="op">==</span> <span class="st">"Y"</span> <span class="st">"COMP24FL"</span> <span class="cf">else</span> <span class="cn">missing</span> <span class="cf">end</span></span>
@@ -12980,6 +13058,11 @@ Data Preparation - Table 8
 </div>
 </div>
 </div>
+</details>
+<details>
+<summary>
+Data wrangling
+</summary>
 <div id="58" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">summary_stats</span>(col)</span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    (</span>
@@ -12995,6 +13078,11 @@ Data Preparation - Table 8
 <pre><code>summary_stats (generic function with 1 method)</code></pre>
 </div>
 </div>
+</details>
+<details>
+<summary>
+Data wrangling
+</summary>
 <div id="60" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>pop_labels <span class="op">=</span> <span class="fu">Dict</span>(</span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"COMP24FL"</span> <span class="op">=&gt;</span> <span class="st">"**Completers at Week 24**&lt;br&gt;"</span>,</span>
@@ -13006,7 +13094,7 @@ Data Preparation - Table 8
   "SAFFL"    =&gt; "**Safety Population**&lt;br&gt;&lt;small&gt;Includes completers and early …</code></pre>
 </div>
 </div>
-
+</details>
 <div id="62" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <table id="st-e94adcb9">
@@ -13155,13 +13243,13 @@ Data Preparation - Table 8
 </tbody></table>
 </div>
 </div>
+</section>
+<section id="table-9" class="level2">
+<h2 class="anchored" data-anchor-id="table-9">TABLE 9</h2>
 <details>
 <summary>
 Data Preparation - Table 9
 </summary>
-</details></section>
-<section id="table-9" class="level2">
-<h2 class="anchored" data-anchor-id="table-9">TABLE 9</h2>
 <div id="64" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>adsl <span class="op">=</span> <span class="pp">@chain</span> adsl_orig <span class="cf">begin</span></span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@rsubset</span> <span class="op">:</span>SAFFL <span class="op">==</span> <span class="st">"Y"</span></span>
@@ -14638,6 +14726,11 @@ Data Preparation - Table 9
 </div>
 </div>
 </div>
+</details>
+<details>
+<summary>
+Data wrangling
+</summary>
 <div id="66" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>adae <span class="op">=</span> <span class="pp">@chain</span> adae_orig <span class="cf">begin</span></span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@rsubset</span> <span class="op">:</span>SAFFL <span class="op">==</span> <span class="st">"Y"</span> <span class="op">&amp;&amp;</span> <span class="op">:</span>TRTEMFL <span class="op">==</span> <span class="st">"Y"</span></span>
@@ -16284,6 +16377,11 @@ Data Preparation - Table 9
 </div>
 </div>
 </div>
+</details>
+<details>
+<summary>
+Data wrangling
+</summary>
 <div id="68" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">complete_ae_data</span>(df_adae, df_adsl; id_col<span class="op">=:</span>USUBJID, soc_col<span class="op">=:</span>AEBODSYS, ae_col<span class="op">=:</span>AETERM, strata_col<span class="op">=:</span>TRTA)</span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>    all_ids <span class="op">=</span> <span class="fu">unique</span>(df_adsl[<span class="op">:</span>, id_col])</span>
@@ -16543,6 +16641,11 @@ Data Preparation - Table 9
 </div>
 </div>
 </div>
+</details>
+<details>
+<summary>
+Data wrangling
+</summary>
 <div id="70" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>ae_any <span class="op">=</span> <span class="pp">@chain</span> adae <span class="cf">begin</span></span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@rtransform</span> <span class="op">:</span>AEBODSYS <span class="op">=</span> <span class="st">"Any Body System"</span></span>
@@ -16786,6 +16889,11 @@ Data Preparation - Table 9
 </div>
 </div>
 </div>
+</details>
+<details>
+<summary>
+Data wrangling
+</summary>
 <div id="72" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>ae_long <span class="op">=</span> <span class="pp">@chain</span> ae_all <span class="cf">begin</span></span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@rtransform</span> <span class="op">:</span>SOC <span class="op">=</span> <span class="op">:</span>AEBODSYS</span>
@@ -17142,7 +17250,7 @@ Data Preparation - Table 9
 </div>
 </div>
 </div>
-
+</details>
 <div id="74" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <table id="st-c51caa02">
@@ -19078,13 +19186,13 @@ Data Preparation - Table 9
 </tbody></table>
 </div>
 </div>
+</section>
+<section id="table-10" class="level2">
+<h2 class="anchored" data-anchor-id="table-10">TABLE 10</h2>
 <details>
 <summary>
 Data Preparation - Table 10
 </summary>
-</details></section>
-<section id="table-10" class="level2">
-<h2 class="anchored" data-anchor-id="table-10">TABLE 10</h2>
 <div id="76" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>adlbc <span class="op">=</span> <span class="pp">@chain</span> <span class="fu">readstat</span>(<span class="fu">joinpath</span>(path, <span class="st">"adlbc.xpt"</span>)) DataFrame <span class="cf">begin</span></span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@rsubset</span> <span class="op">:</span>SAFFL <span class="op">==</span> <span class="st">"Y"</span> <span class="op">&amp;&amp;</span> (<span class="op">:</span>AVISITN <span class="op">!=</span> <span class="fl">99</span> <span class="op">||</span> (<span class="op">:</span>AVISITN <span class="op">==</span> <span class="fl">99</span> <span class="op">&amp;&amp;</span> <span class="op">:</span>AENTMTFL <span class="op">==</span> <span class="st">"Y"</span>))</span>
@@ -20477,6 +20585,11 @@ Data Preparation - Table 10
 </div>
 </div>
 </div>
+</details>
+<details>
+<summary>
+Data wrangling
+</summary>
 <div id="78" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>adlbc2 <span class="op">=</span> <span class="fu">insertcols</span>(<span class="fu">copy</span>(adlbc), <span class="op">:</span>ORIG <span class="op">=&gt;</span> <span class="fu">fill</span>(<span class="st">"CHEMISTRY"</span>, <span class="fu">nrow</span>(adlbc)))</span>
 <span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>adlbh2 <span class="op">=</span> <span class="fu">insertcols</span>(<span class="fu">copy</span>(adlbh), <span class="op">:</span>ORIG <span class="op">=&gt;</span> <span class="fu">fill</span>(<span class="st">"HEMATOLOGY"</span>, <span class="fu">nrow</span>(adlbh)))</span>
@@ -20867,6 +20980,11 @@ Data Preparation - Table 10
 </div>
 </div>
 </div>
+</details>
+<details>
+<summary>
+Data wrangling
+</summary>
 <div id="80" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>adlb_l <span class="op">=</span> <span class="fu">stack</span>(adlb, [<span class="op">:</span>AVAL, <span class="op">:</span>CHG], variable_name <span class="op">=</span> <span class="op">:</span>VARIABLE, value_name <span class="op">=</span> <span class="op">:</span>VALUE)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
@@ -21244,6 +21362,11 @@ Data Preparation - Table 10
 </div>
 </div>
 </div>
+</details>
+<details>
+<summary>
+Data wrangling
+</summary>
 <div id="82" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb38"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>group_vars <span class="op">=</span> [<span class="op">:</span>ORIG, <span class="op">:</span>PARCAT1, <span class="op">:</span>PARAM, <span class="op">:</span>PARAMCD, <span class="op">:</span>AVISIT, <span class="op">:</span>AVISITN, <span class="op">:</span>VARIABLE]</span>
 <span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>adlb_n <span class="op">=</span> <span class="fu">groupby</span>(adlb_l, group_vars)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -21681,6 +21804,11 @@ Data Preparation - Table 10
 </div>
 </div>
 </div>
+</details>
+<details>
+<summary>
+Data wrangling
+</summary>
 <div id="84" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb39"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">custom_lab_summary</span>(x)</span>
 <span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>    data <span class="op">=</span> <span class="fu">collect</span>(<span class="fu">skipmissing</span>(x))</span>
@@ -21708,6 +21836,11 @@ Data Preparation - Table 10
 <pre><code>custom_lab_summary (generic function with 1 method)</code></pre>
 </div>
 </div>
+</details>
+<details>
+<summary>
+Data wrangling
+</summary>
 <div id="86" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb41"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>group_vars <span class="op">=</span> [<span class="op">:</span>PARAM, <span class="op">:</span>AVISIT, <span class="op">:</span>TRTA, <span class="op">:</span>VARIABLE]</span>
 <span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -22010,6 +22143,11 @@ Data Preparation - Table 10
 </div>
 </div>
 </div>
+</details>
+<details>
+<summary>
+Data wrangling
+</summary>
 <div id="88" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb42"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>adlb_summary_long <span class="op">=</span> <span class="fu">stack</span>(</span>
 <span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>    adlb_summary,</span>
@@ -22280,6 +22418,11 @@ Data Preparation - Table 10
 </div>
 </div>
 </div>
+</details>
+<details>
+<summary>
+Data wrangling
+</summary>
 <div id="90" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb43"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>adlb_summary_long1 <span class="op">=</span> <span class="pp">@chain</span> adlb_summary_long <span class="cf">begin</span></span>
 <span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@transform</span> <span class="op">:</span>VALUE <span class="op">=</span> <span class="fu">replace</span>(<span class="op">:</span>VALUE, <span class="cn">NaN</span><span class="op">=&gt;</span><span class="cn">missing</span>)</span>
@@ -22548,6 +22691,11 @@ Data Preparation - Table 10
 </div>
 </div>
 </div>
+</details>
+<details>
+<summary>
+Data wrangling
+</summary>
 <div id="92" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb44"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>adlb_summary_long2 <span class="op">=</span> <span class="fu">combine</span>(<span class="fu">groupby</span>(adlb_summary_long1,[<span class="op">:</span>VARIABLE])) <span class="cf">do</span> df</span>
 <span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="fu">all</span>(x <span class="op">-&gt;</span> x <span class="op">==</span> <span class="st">"CHG"</span>, df.VARIABLE)</span>
@@ -22819,6 +22967,11 @@ Data Preparation - Table 10
 </div>
 </div>
 </div>
+</details>
+<details>
+<summary>
+Data wrangling
+</summary>
 <div id="94" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb45"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>adlb_summary_long3 <span class="op">=</span> <span class="pp">@chain</span> adlb_summary_long2 <span class="cf">begin</span></span>
 <span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>   <span class="pp">@rtransform</span> <span class="op">:</span>SummaryType <span class="op">=</span> (<span class="op">:</span>VARIABLE <span class="op">==</span> <span class="st">"CHG"</span>) ? <span class="st">"CHG"</span> <span class="op">:</span> <span class="op">:</span>SummaryType</span>
@@ -23087,7 +23240,7 @@ Data Preparation - Table 10
 </div>
 </div>
 </div>
-
+</details>
 <div id="96" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <table id="st-37350022">
@@ -33701,13 +33854,13 @@ Data Preparation - Table 10
 </tbody></table>
 </div>
 </div>
+</section>
+<section id="table-11" class="level2">
+<h2 class="anchored" data-anchor-id="table-11">TABLE 11</h2>
 <details>
 <summary>
 Data Preparation - Table 11
 </summary>
-</details></section>
-<section id="table-11" class="level2">
-<h2 class="anchored" data-anchor-id="table-11">TABLE 11</h2>
 <div id="98" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb46"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>adlbc2 <span class="op">=</span> <span class="fu">insertcols</span>(<span class="fu">copy</span>(adlbc), <span class="op">:</span>ORIG <span class="op">=&gt;</span> <span class="fu">fill</span>(<span class="st">"CHEMISTRY"</span>, <span class="fu">nrow</span>(adlbc)))</span>
@@ -34138,6 +34291,11 @@ Data Preparation - Table 11
 </div>
 </div>
 </div>
+</details>
+<details>
+<summary>
+Data wrangling
+</summary>
 <div id="100" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb47"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>adlb_cross <span class="op">=</span> <span class="pp">@chain</span> adlb <span class="cf">begin</span></span>
 <span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">groupby</span>([<span class="op">:</span>ORIG, <span class="op">:</span>PARAM, <span class="op">:</span>TRTA, <span class="op">:</span>LBNRIND])</span>
@@ -34523,6 +34681,11 @@ Data Preparation - Table 11
 </div>
 </div>
 </div>
+</details>
+<details>
+<summary>
+Data wrangling
+</summary>
 <div id="102" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb48"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>adlb_summary <span class="op">=</span> <span class="pp">@chain</span> adlb <span class="cf">begin</span></span>
 <span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">groupby</span>([<span class="op">:</span>ORIG, <span class="op">:</span>TRTA, <span class="op">:</span>LBNRIND, <span class="op">:</span>PARAM])</span>
@@ -34821,6 +34984,11 @@ Data Preparation - Table 11
 </div>
 </div>
 </div>
+</details>
+<details>
+<summary>
+Data wrangling
+</summary>
 <div id="104" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb49"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>tbl_final <span class="op">=</span> <span class="pp">@chain</span> adlb_summary <span class="cf">begin</span></span>
 <span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="op">:</span>ORIG, <span class="op">:</span>TRTA, <span class="op">:</span>PARAM, <span class="op">:</span>Low, <span class="op">:</span>Normal, <span class="op">:</span>High, <span class="op">:</span>Total)</span>
@@ -35122,7 +35290,7 @@ Data Preparation - Table 11
 </div>
 </div>
 </div>
-
+</details>
 <div id="106" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <table id="st-6047ff43">
@@ -35560,13 +35728,13 @@ Data Preparation - Table 11
 </tbody></table>
 </div>
 </div>
+</section>
+<section id="table-12" class="level2">
+<h2 class="anchored" data-anchor-id="table-12">TABLE 12</h2>
 <details>
 <summary>
 Data Preparation - Table 12
 </summary>
-</details></section>
-<section id="table-12" class="level2">
-<h2 class="anchored" data-anchor-id="table-12">TABLE 12</h2>
 <div id="108" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb50"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>adlbc2 <span class="op">=</span> <span class="fu">insertcols</span>(<span class="fu">copy</span>(adlbc), <span class="op">:</span>ORIG <span class="op">=&gt;</span> <span class="fu">fill</span>(<span class="st">"CHEMISTRY"</span>, <span class="fu">nrow</span>(adlbc)))</span>
 <span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>adlbh2 <span class="op">=</span> <span class="fu">insertcols</span>(<span class="fu">copy</span>(adlbh), <span class="op">:</span>ORIG <span class="op">=&gt;</span> <span class="fu">fill</span>(<span class="st">"HEMATOLOGY"</span>, <span class="fu">nrow</span>(adlbh)))</span>
@@ -36982,6 +37150,11 @@ Data Preparation - Table 12
 </div>
 </div>
 </div>
+</details>
+<details>
+<summary>
+Data wrangling
+</summary>
 <div id="110" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb51"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>lab_keep <span class="op">=</span> [<span class="st">"Alanine Aminotransferase"</span>, <span class="st">"Albumin"</span>, <span class="st">"Basophils"</span>, <span class="st">"Eosinophils"</span>]</span>
 <span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -38419,6 +38592,11 @@ Data Preparation - Table 12
 </div>
 </div>
 </div>
+</details>
+<details>
+<summary>
+Data wrangling
+</summary>
 <div id="112" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb52"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>group_vars <span class="op">=</span> [<span class="op">:</span>ORIG, <span class="op">:</span>PARAM, <span class="op">:</span>PARAMCD, <span class="op">:</span>TRTP, <span class="op">:</span>VISIT]</span>
 <span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>adlb_groups <span class="op">=</span> <span class="fu">groupby</span>(adlb1, group_vars)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -41190,6 +41368,11 @@ Data Preparation - Table 12
 </div>
 </div>
 </div>
+</details>
+<details>
+<summary>
+Data wrangling
+</summary>
 <div id="114" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb53"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">shift_table</span>(df)</span>
 <span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>    tbl <span class="op">=</span> <span class="pp">@chain</span> df <span class="cf">begin</span></span>
@@ -41204,6 +41387,11 @@ Data Preparation - Table 12
 <pre><code>shift_table (generic function with 1 method)</code></pre>
 </div>
 </div>
+</details>
+<details>
+<summary>
+Data wrangling
+</summary>
 <div id="116" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb55"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Tables</span></span>
 <span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -41479,6 +41667,11 @@ Data Preparation - Table 12
 </div>
 </div>
 </div>
+</details>
+<details>
+<summary>
+Data wrangling
+</summary>
 <div id="118" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb56"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> <span class="fu">eachrow</span>(shifts_df)</span>
 <span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>tables_list <span class="op">=</span> <span class="fu">map</span>(rows) <span class="cf">do</span> row</span>
@@ -41812,6 +42005,11 @@ Data Preparation - Table 12
 </div>
 </div>
 </div>
+</details>
+<details>
+<summary>
+Data wrangling
+</summary>
 <div id="120" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb57"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>tbl_final <span class="op">=</span> <span class="pp">@chain</span> shifts_long <span class="cf">begin</span></span>
 <span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stack</span>(<span class="fu">Not</span>([<span class="op">:</span>ORIG, <span class="op">:</span>PARAM, <span class="op">:</span>PARAMCD, <span class="op">:</span>TRTP, <span class="op">:</span>VISIT, <span class="op">:</span>RowLabel]),</span>
@@ -42112,6 +42310,11 @@ Data Preparation - Table 12
 </div>
 </div>
 </div>
+</details>
+<details>
+<summary>
+Data wrangling
+</summary>
 <div id="122" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb58"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>tbl_final_cleaned <span class="op">=</span> <span class="pp">@chain</span> shifts_long <span class="cf">begin</span></span>
 <span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stack</span>(<span class="fu">Not</span>([<span class="op">:</span>ORIG, <span class="op">:</span>PARAM, <span class="op">:</span>PARAMCD, <span class="op">:</span>TRTP, <span class="op">:</span>VISIT, <span class="op">:</span>RowLabel]),</span>
@@ -42385,6 +42588,11 @@ Data Preparation - Table 12
 </div>
 </div>
 </div>
+</details>
+<details>
+<summary>
+Data wrangling
+</summary>
 <div id="124" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb59"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>tbl_f <span class="op">=</span> <span class="pp">@chain</span> tbl_final_cleaned <span class="cf">begin</span></span>
 <span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">groupby</span>([<span class="op">:</span>ORIG, <span class="op">:</span>PARAM, <span class="op">:</span>TRTP, <span class="op">:</span>VISIT, <span class="op">:</span>ShiftTo])</span>
@@ -42655,7 +42863,7 @@ Data Preparation - Table 12
 </div>
 </div>
 </div>
-
+</details>
 <div id="126" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <table id="st-37a046a6">

@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Mohammed Shas">
 
-<title>adnca-dataprep – NCA Analysis Website</title>
+<title>DAPA01 NCA – NCA Analysis Website</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -171,9 +172,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">DAPA01 NCA</h1>
+</div>
 
 
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Mohammed Shas </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
 
 
 <div id="2" class="cell" data-execution_count="1">
@@ -189,7 +212,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="define-the-path-and-load-the-data" class="level2">
 <h2 class="anchored" data-anchor-id="define-the-path-and-load-the-data">Define the path and load the data</h2>
 <div id="4" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>path <span class="op">=</span> <span class="st">"C:</span><span class="sc">\\</span><span class="st">quarto_website</span><span class="sc">\\</span><span class="st">quarto_project</span><span class="sc">\\</span><span class="st">Datasets"</span></span>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>path <span class="op">=</span> <span class="fu">joinpath</span>(<span class="pp">@__DIR__</span>, <span class="st">".."</span>, <span class="st">"Datasets"</span>) <span class="op">|&gt;</span> normpath</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>pc <span class="op">=</span> <span class="pp">@chain</span> <span class="fu">readstat</span>(<span class="fu">joinpath</span>(path, <span class="st">"pc1.xpt"</span>)) DataFrame convert_blanks_to_missing</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>ex <span class="op">=</span> <span class="pp">@chain</span> <span class="fu">readstat</span>(<span class="fu">joinpath</span>(path, <span class="st">"ex1.xpt"</span>)) DataFrame convert_blanks_to_missing</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">first</span>(ex, <span class="fl">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
