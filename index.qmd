@@ -7,6 +7,6 @@ format: html
 
 This site contains the rendered NCA datasets and summary tables for:
 
-- [CDISCPILOT NCA](Scripts/ADNCA-dataprep.qmd)
-- [DAPA01 NCA](Scripts/admiral-summarytables.qmd)
+- [CDISCPILOT NCA](Scripts/admiral-pharmaverse.qmd)
+- [DAPA01 NCA](Scripts/ADNCA-dataprep.qmd)
 - [Summary statistics and tables](Scripts/admiral-summarytables.qmd)

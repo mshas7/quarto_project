@@ -1,5 +1,6 @@
 project:
   type: website
+  output-dir: docs
 
 website:
   title: "NCA Analysis Website"
@@ -7,12 +8,12 @@ website:
     left:
       - href: index.qmd
         text: Home
-      - href: Scripts/admiral-pharmaverse.qmd
-        text: CDISCPILOT NCA
-      - href: Scripts/ADNCA-dataprep.qmd
-        text: DAPA01 NCA
-      - href: Scripts/admiral-summarytables.qmd
-        text: Summary Tables
+  #     - href: Scripts/admiral-pharmaverse.qmd
+  #       text: CDISCPILOT NCA
+  #     - href: Scripts/ADNCA-dataprep.qmd
+  #       text: DAPA01 NCA
+  #     - href: Scripts/admiral-summarytables.qmd
+  #       text: Summary Tables
 
 format:
   html:
