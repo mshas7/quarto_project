@@ -8,12 +8,10 @@ website:
     left:
       - href: index.qmd
         text: Home
-  #     - href: Scripts/admiral-pharmaverse.qmd
-  #       text: CDISCPILOT NCA
-  #     - href: Scripts/ADNCA-dataprep.qmd
-  #       text: DAPA01 NCA
-  #     - href: Scripts/admiral-summarytables.qmd
-  #       text: Summary Tables
+    right:
+      - icon: github
+        href: https://github.com/mshas7/quarto_project
+        aria-label: GitHub
 
 format:
   html:
