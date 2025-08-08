@@ -7,7 +7,7 @@ julia:
 ---
 
 
-
+## Import Packages
 
 ```{julia}
 using DataFramesMeta
@@ -81,7 +81,7 @@ first(pc_prep, 5)
 
 
 
-## EX Data Prep
+## EX data preparation
 
 ```{julia}
 ex_prep = @chain ex begin
@@ -109,7 +109,7 @@ first(ex_prep, 5)
 
 
 
-## EXPANDING DOSE
+## Expanding Dose
 ```{julia}
 ex_exp = @chain ex_prep begin
    leftjoin(dose_freq_lookup, on = [:EXDOSFRQ => :CDISC_VALUE])
@@ -156,8 +156,8 @@ first(adpc_first_dose, 5)
 
 
 
-## FIND PREVIOUS DOSE
-## FIND NEXT DOSE
+## Find Previous Dose
+## Find Next Dose
 
 ```{julia}
 adpc_nom_next = @chain adpc_first_dose begin
@@ -330,10 +330,12 @@ adpc_dtype = @chain vcat(adpc_aval, dtype; cols = :union) begin
 
     @rtransform :ANL02FL = ismissing(:DTYPE) ? "Y" : missing
 end
+first(adpc_dtype, 5)
+
 ```
 
 
-
+#  Derive BASE and Calculate Change from Baseline 
 
 ```{julia}
 adpc_base = @chain adpc_dtype begin
@@ -349,7 +351,7 @@ first(adpc_base, 5)
 
 
 
-# Derive BASE and Calculate Change from Baseline 
+# Calculate CHG for post-baseline records
 
 
 ```{julia}

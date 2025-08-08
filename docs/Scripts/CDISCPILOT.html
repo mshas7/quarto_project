@@ -157,14 +157,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#define-the-path-and-load-the-data" id="toc-define-the-path-and-load-the-data" class="nav-link active" data-scroll-target="#define-the-path-and-load-the-data">Define the path and load the data</a></li>
+  <li><a href="#import-packages" id="toc-import-packages" class="nav-link active" data-scroll-target="#import-packages">Import Packages</a></li>
+  <li><a href="#define-the-path-and-load-the-data" id="toc-define-the-path-and-load-the-data" class="nav-link" data-scroll-target="#define-the-path-and-load-the-data">Define the path and load the data</a></li>
   <li><a href="#lookup-table" id="toc-lookup-table" class="nav-link" data-scroll-target="#lookup-table">Lookup table</a></li>
   <li><a href="#pc-data-preparation" id="toc-pc-data-preparation" class="nav-link" data-scroll-target="#pc-data-preparation">PC data preparation</a></li>
-  <li><a href="#ex-data-prep" id="toc-ex-data-prep" class="nav-link" data-scroll-target="#ex-data-prep">Ex Data Prep</a></li>
-  <li><a href="#expanding-dose" id="toc-expanding-dose" class="nav-link" data-scroll-target="#expanding-dose">EXPANDING DOSE</a></li>
+  <li><a href="#ex-data-preparation" id="toc-ex-data-preparation" class="nav-link" data-scroll-target="#ex-data-preparation">EX data preparation</a></li>
+  <li><a href="#expanding-dose" id="toc-expanding-dose" class="nav-link" data-scroll-target="#expanding-dose">Expanding dose</a></li>
   <li><a href="#filter-ex_expanded-for-valid-doses-and-adtm" id="toc-filter-ex_expanded-for-valid-doses-and-adtm" class="nav-link" data-scroll-target="#filter-ex_expanded-for-valid-doses-and-adtm">Filter ex_expanded for valid doses and ADTM</a></li>
-  <li><a href="#find-previous-dose" id="toc-find-previous-dose" class="nav-link" data-scroll-target="#find-previous-dose">FIND PREVIOUS DOSE</a></li>
-  <li><a href="#find-next-dose" id="toc-find-next-dose" class="nav-link" data-scroll-target="#find-next-dose">FIND NEXT DOSE</a></li>
+  <li><a href="#find-previous-dose" id="toc-find-previous-dose" class="nav-link" data-scroll-target="#find-previous-dose">Find Previous Dose</a></li>
+  <li><a href="#find-next-dose" id="toc-find-next-dose" class="nav-link" data-scroll-target="#find-next-dose">Find Next Dose</a></li>
   <li><a href="#derive-relative-time-variables" id="toc-derive-relative-time-variables" class="nav-link" data-scroll-target="#derive-relative-time-variables">Derive Relative Time Variables</a>
   <ul class="collapse">
   <li><a href="#derive-nominal-relative-time-from-reference-dose-nrrlt" id="toc-derive-nominal-relative-time-from-reference-dose-nrrlt" class="nav-link" data-scroll-target="#derive-nominal-relative-time-from-reference-dose-nrrlt">Derive Nominal Relative Time from Reference Dose (NRRLT)</a></li>
@@ -208,6 +209,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
+<section id="import-packages" class="level2">
+<h2 class="anchored" data-anchor-id="import-packages">Import Packages</h2>
 <div id="2" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">DataFramesMeta</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">ReadStatTables</span></span>
@@ -218,6 +221,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>find_next_nominal_time (generic function with 1 method)</code></pre>
 </div>
 </div>
+</section>
 <section id="define-the-path-and-load-the-data" class="level2">
 <h2 class="anchored" data-anchor-id="define-the-path-and-load-the-data">Define the path and load the data</h2>
 <div id="4" class="cell" data-execution_count="1">
@@ -1000,8 +1004,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </section>
-<section id="ex-data-prep" class="level2">
-<h2 class="anchored" data-anchor-id="ex-data-prep">Ex Data Prep</h2>
+<section id="ex-data-preparation" class="level2">
+<h2 class="anchored" data-anchor-id="ex-data-preparation">EX data preparation</h2>
 <div id="10" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>ex_prep <span class="op">=</span> <span class="pp">@chain</span> ex <span class="cf">begin</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">leftjoin</span>(adsl_subset, on <span class="op">=</span> [<span class="op">:</span>STUDYID, <span class="op">:</span>USUBJID])</span>
@@ -1243,7 +1247,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </section>
 <section id="expanding-dose" class="level2">
-<h2 class="anchored" data-anchor-id="expanding-dose">EXPANDING DOSE</h2>
+<h2 class="anchored" data-anchor-id="expanding-dose">Expanding dose</h2>
 <div id="12" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>ex_exp <span class="op">=</span> <span class="pp">@chain</span> ex_prep <span class="cf">begin</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -1849,10 +1853,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </section>
 <section id="find-previous-dose" class="level2">
-<h2 class="anchored" data-anchor-id="find-previous-dose">FIND PREVIOUS DOSE</h2>
+<h2 class="anchored" data-anchor-id="find-previous-dose">Find Previous Dose</h2>
 </section>
 <section id="find-next-dose" class="level2">
-<h2 class="anchored" data-anchor-id="find-next-dose">FIND NEXT DOSE</h2>
+<h2 class="anchored" data-anchor-id="find-next-dose">Find Next Dose</h2>
 <div id="16" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>adpc_nom_next <span class="op">=</span> <span class="pp">@chain</span> adpc_first_dose <span class="cf">begin</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">find_previous_dose</span>(ex_exp)</span>

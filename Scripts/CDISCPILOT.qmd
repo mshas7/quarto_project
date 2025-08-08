@@ -6,7 +6,7 @@ julia:
       - "--project=."
 ---
 
-
+## Import Packages
 
 ```{julia}
 using DataFramesMeta
@@ -77,7 +77,7 @@ first(pc_prep, 5)
 
 
 
-## Ex Data Prep
+## EX data preparation
 
 ```{julia}
 ex_prep = @chain ex begin
@@ -102,7 +102,7 @@ first(ex_prep, 5)
 
 
 
-## EXPANDING DOSE
+## Expanding dose
 ```{julia}
 ex_exp = @chain ex_prep begin
 
@@ -145,8 +145,8 @@ first(adpc_first_dose, 5)
 
 
 
-## FIND PREVIOUS DOSE
-## FIND NEXT DOSE
+## Find Previous Dose
+## Find Next Dose
 
 ```{julia}
 adpc_nom_next = @chain adpc_first_dose begin
