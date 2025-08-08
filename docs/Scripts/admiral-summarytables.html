@@ -12823,8 +12823,8 @@ Data Preparation - Table 8
 <span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>        levels <span class="op">=</span> [<span class="st">"Placebo"</span>, <span class="st">"Xanomeline Low Dose"</span>, <span class="st">"Xanomeline High Dose"</span>],</span>
 <span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>        ordered <span class="op">=</span> <span class="cn">true</span>)</span>
 <span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@transform</span> <span class="op">:</span>TRT01P <span class="op">=</span> <span class="fu">recode</span>(<span class="op">:</span>TRT01P,</span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Xanomeline Low Dose"</span> <span class="op">=&gt;</span> <span class="st">"Xanomeline&lt;br&gt;Low Dose"</span>,</span>
-<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Xanomeline High Dose"</span> <span class="op">=&gt;</span> <span class="st">"Xanomeline&lt;br&gt;High Dose"</span>)</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Xanomeline Low Dose"</span> <span class="op">=&gt;</span> <span class="st">"Xanomeline Low Dose"</span>,</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Xanomeline High Dose"</span> <span class="op">=&gt;</span> <span class="st">"Xanomeline High Dose"</span>)</span>
 <span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@rtransform</span> <span class="op">:</span>POP <span class="op">=</span> <span class="cf">if</span> <span class="op">:</span>POP <span class="op">==</span> <span class="st">"COMP24FL"</span></span>
 <span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elseif</span> <span class="op">:</span>POP <span class="op">==</span> <span class="st">"SAFFL"</span></span>
 <span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span></span>
@@ -12873,7 +12873,7 @@ Data Preparation - Table 8
 <td class="rowNumber" style="text-align: right; font-weight: bold;">3</td>
 <td style="text-align: left; font-style: italic;"></td>
 <td style="text-align: left;">01-701-1028</td>
-<td style="text-align: left;">Xanomeline&lt;br&gt;High Dose</td>
+<td style="text-align: left;">Xanomeline High Dose</td>
 <td style="text-align: right;">77.7</td>
 <td style="text-align: right;">13986.0</td>
 </tr>
@@ -12881,7 +12881,7 @@ Data Preparation - Table 8
 <td class="rowNumber" style="text-align: right; font-weight: bold;">4</td>
 <td style="text-align: left; font-style: italic;"></td>
 <td style="text-align: left;">01-701-1033</td>
-<td style="text-align: left;">Xanomeline&lt;br&gt;Low Dose</td>
+<td style="text-align: left;">Xanomeline Low Dose</td>
 <td style="text-align: right;">54.0</td>
 <td style="text-align: right;">756.0</td>
 </tr>
@@ -12889,7 +12889,7 @@ Data Preparation - Table 8
 <td class="rowNumber" style="text-align: right; font-weight: bold;">5</td>
 <td style="text-align: left; font-style: italic;"></td>
 <td style="text-align: left;">01-701-1034</td>
-<td style="text-align: left;">Xanomeline&lt;br&gt;High Dose</td>
+<td style="text-align: left;">Xanomeline High Dose</td>
 <td style="text-align: right;">76.9</td>
 <td style="text-align: right;">14067.0</td>
 </tr>
@@ -12905,7 +12905,7 @@ Data Preparation - Table 8
 <td class="rowNumber" style="text-align: right; font-weight: bold;">7</td>
 <td style="text-align: left; font-style: italic;"></td>
 <td style="text-align: left;">01-701-1097</td>
-<td style="text-align: left;">Xanomeline&lt;br&gt;Low Dose</td>
+<td style="text-align: left;">Xanomeline Low Dose</td>
 <td style="text-align: right;">54.0</td>
 <td style="text-align: right;">10260.0</td>
 </tr>
@@ -12913,7 +12913,7 @@ Data Preparation - Table 8
 <td class="rowNumber" style="text-align: right; font-weight: bold;">8</td>
 <td style="text-align: left; font-style: italic;"></td>
 <td style="text-align: left;">01-701-1111</td>
-<td style="text-align: left;">Xanomeline&lt;br&gt;Low Dose</td>
+<td style="text-align: left;">Xanomeline Low Dose</td>
 <td style="text-align: right;">54.0</td>
 <td style="text-align: right;">540.0</td>
 </tr>
@@ -12921,7 +12921,7 @@ Data Preparation - Table 8
 <td class="rowNumber" style="text-align: right; font-weight: bold;">9</td>
 <td style="text-align: left; font-style: italic;"></td>
 <td style="text-align: left;">01-701-1115</td>
-<td style="text-align: left;">Xanomeline&lt;br&gt;Low Dose</td>
+<td style="text-align: left;">Xanomeline Low Dose</td>
 <td style="text-align: right;">54.0</td>
 <td style="text-align: right;">2970.0</td>
 </tr>
@@ -12945,7 +12945,7 @@ Data Preparation - Table 8
 <td class="rowNumber" style="text-align: right; font-weight: bold;">12</td>
 <td style="text-align: left; font-style: italic;"></td>
 <td style="text-align: left;">01-701-1133</td>
-<td style="text-align: left;">Xanomeline&lt;br&gt;High Dose</td>
+<td style="text-align: left;">Xanomeline High Dose</td>
 <td style="text-align: right;">77.2</td>
 <td style="text-align: right;">14121.0</td>
 </tr>
@@ -12953,7 +12953,7 @@ Data Preparation - Table 8
 <td class="rowNumber" style="text-align: right; font-weight: bold;">13</td>
 <td style="text-align: left; font-style: italic;"></td>
 <td style="text-align: left;">01-701-1146</td>
-<td style="text-align: left;">Xanomeline&lt;br&gt;High Dose</td>
+<td style="text-align: left;">Xanomeline High Dose</td>
 <td style="text-align: right;">70.3</td>
 <td style="text-align: right;">2673.0</td>
 </tr>
@@ -12969,7 +12969,7 @@ Data Preparation - Table 8
 <td class="rowNumber" style="text-align: right; font-weight: bold;">243</td>
 <td style="text-align: left; font-style: italic;"></td>
 <td style="text-align: left;">01-718-1079</td>
-<td style="text-align: left;">Xanomeline&lt;br&gt;Low Dose</td>
+<td style="text-align: left;">Xanomeline Low Dose</td>
 <td style="text-align: right;">54.0</td>
 <td style="text-align: right;">2322.0</td>
 </tr>
@@ -12977,7 +12977,7 @@ Data Preparation - Table 8
 <td class="rowNumber" style="text-align: right; font-weight: bold;">244</td>
 <td style="text-align: left; font-style: italic;"></td>
 <td style="text-align: left;">01-718-1101</td>
-<td style="text-align: left;">Xanomeline&lt;br&gt;High Dose</td>
+<td style="text-align: left;">Xanomeline High Dose</td>
 <td style="text-align: right;">78.5</td>
 <td style="text-align: right;">12960.0</td>
 </tr>
@@ -13001,7 +13001,7 @@ Data Preparation - Table 8
 <td class="rowNumber" style="text-align: right; font-weight: bold;">247</td>
 <td style="text-align: left; font-style: italic;"></td>
 <td style="text-align: left;">01-718-1170</td>
-<td style="text-align: left;">Xanomeline&lt;br&gt;Low Dose</td>
+<td style="text-align: left;">Xanomeline Low Dose</td>
 <td style="text-align: right;">54.0</td>
 <td style="text-align: right;">1458.0</td>
 </tr>
@@ -13017,7 +13017,7 @@ Data Preparation - Table 8
 <td class="rowNumber" style="text-align: right; font-weight: bold;">249</td>
 <td style="text-align: left; font-style: italic;"></td>
 <td style="text-align: left;">01-718-1250</td>
-<td style="text-align: left;">Xanomeline&lt;br&gt;Low Dose</td>
+<td style="text-align: left;">Xanomeline Low Dose</td>
 <td style="text-align: right;">54.0</td>
 <td style="text-align: right;">7182.0</td>
 </tr>
@@ -13025,7 +13025,7 @@ Data Preparation - Table 8
 <td class="rowNumber" style="text-align: right; font-weight: bold;">250</td>
 <td style="text-align: left; font-style: italic;"></td>
 <td style="text-align: left;">01-718-1254</td>
-<td style="text-align: left;">Xanomeline&lt;br&gt;Low Dose</td>
+<td style="text-align: left;">Xanomeline Low Dose</td>
 <td style="text-align: right;">54.0</td>
 <td style="text-align: right;">9936.0</td>
 </tr>
@@ -13033,7 +13033,7 @@ Data Preparation - Table 8
 <td class="rowNumber" style="text-align: right; font-weight: bold;">251</td>
 <td style="text-align: left; font-style: italic;"></td>
 <td style="text-align: left;">01-718-1328</td>
-<td style="text-align: left;">Xanomeline&lt;br&gt;High Dose</td>
+<td style="text-align: left;">Xanomeline High Dose</td>
 <td style="text-align: right;">76.1</td>
 <td style="text-align: right;">5859.0</td>
 </tr>
@@ -13049,7 +13049,7 @@ Data Preparation - Table 8
 <td class="rowNumber" style="text-align: right; font-weight: bold;">253</td>
 <td style="text-align: left; font-style: italic;"></td>
 <td style="text-align: left;">01-718-1371</td>
-<td style="text-align: left;">Xanomeline&lt;br&gt;High Dose</td>
+<td style="text-align: left;">Xanomeline High Dose</td>
 <td style="text-align: right;">77.4</td>
 <td style="text-align: right;">7587.0</td>
 </tr>
@@ -13057,7 +13057,7 @@ Data Preparation - Table 8
 <td class="rowNumber" style="text-align: right; font-weight: bold;">254</td>
 <td style="text-align: left; font-style: italic;"></td>
 <td style="text-align: left;">01-718-1427</td>
-<td style="text-align: left;">Xanomeline&lt;br&gt;High Dose</td>
+<td style="text-align: left;">Xanomeline High Dose</td>
 <td style="text-align: right;">73.9</td>
 <td style="text-align: right;">4212.0</td>
 </tr>
@@ -13105,9 +13105,9 @@ Data wrangling
 </details>
 <div id="62" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
-<table id="st-e94adcb9">
+<table id="st-7d9b350d">
     <style>
-        #st-e94adcb9 {
+        #st-7d9b350d {
             border: none;
             margin: 0 auto;
             padding: 0.25rem;
@@ -13115,24 +13115,24 @@ Data wrangling
             border-spacing: 0.85em 0.2em;
             line-height: 1.2em;
         }
-        #st-e94adcb9 tr {
+        #st-7d9b350d tr {
             background-color: transparent;
             border: none;
         }
-        #st-e94adcb9 tr td {
+        #st-7d9b350d tr td {
             vertical-align: top;
             padding: 0;
             border: none;
             background-color: transparent;
         }
-        #st-e94adcb9 br {
+        #st-7d9b350d br {
             line-height: 0em;
             margin: 0;
         }
-        #st-e94adcb9 sub {
+        #st-7d9b350d sub {
             line-height: 0;
         }
-        #st-e94adcb9 sup {
+        #st-7d9b350d sup {
             line-height: 0;
         }
     </style>
@@ -13146,8 +13146,8 @@ Data wrangling
         <td style="text-align:center;"></td>
         <td style="font-weight:bold;text-align:center;">Total<br>(n=254)</td>
         <td style="text-align:center;">Placebo<br>(n=86)</td>
-        <td style="text-align:center;">Xanomeline&lt;br&gt;Low Dose<br>(n=84)</td>
-        <td style="text-align:center;">Xanomeline&lt;br&gt;High Dose<br>(n=84)</td>
+        <td style="text-align:center;">Xanomeline Low Dose<br>(n=84)</td>
+        <td style="text-align:center;">Xanomeline High Dose<br>(n=84)</td>
     </tr>
         <tr><td colspan="5" style="border-bottom:1px solid currentColor;padding:0"></td></tr>    <tr>
         <td style="font-weight:bold;text-align:left;">Average daily dose (mg)</td>

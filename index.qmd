@@ -1,11 +1,10 @@
 ---
-title: "Welcome"
+title: "Welcome to the NCA Report Site"
 format: html
 ---
 
-# Welcome to the NCA Report Site
 
-This site contains the rendered NCA datasets and summary tables for:
+This site contains ADNCA Data Preparation and Summary Tables code in well formated document.
 
 - [CDISCPILOT NCA](Scripts/CDISCPILOT.qmd)
 - [DAPA01 NCA](Scripts/DAPA01.qmd)

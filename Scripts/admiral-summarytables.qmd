@@ -629,8 +629,8 @@ adsl_l = @chain adsl_orig begin
         levels = ["Placebo", "Xanomeline Low Dose", "Xanomeline High Dose"],
         ordered = true)
     @transform :TRT01P = recode(:TRT01P,
-        "Xanomeline Low Dose" => "Xanomeline<br>Low Dose",
-        "Xanomeline High Dose" => "Xanomeline<br>High Dose")
+        "Xanomeline Low Dose" => "Xanomeline Low Dose",
+        "Xanomeline High Dose" => "Xanomeline High Dose")
     @rtransform :POP = if :POP == "COMP24FL"
     elseif :POP == "SAFFL"
     else
