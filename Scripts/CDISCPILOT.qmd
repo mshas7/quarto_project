@@ -77,7 +77,7 @@ first(pc_prep, 5)
 
 
 
-## ex data Prep
+## Ex Data Prep
 
 ```{julia}
 ex_prep = @chain ex begin

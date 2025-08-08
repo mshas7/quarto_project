@@ -157,7 +157,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#define-the-path-and-load-the-data" id="toc-define-the-path-and-load-the-data" class="nav-link active" data-scroll-target="#define-the-path-and-load-the-data">Define the path and load the data</a></li>
   <li><a href="#lookup-table" id="toc-lookup-table" class="nav-link" data-scroll-target="#lookup-table">Lookup table</a></li>
   <li><a href="#pc-data-preparation" id="toc-pc-data-preparation" class="nav-link" data-scroll-target="#pc-data-preparation">PC data preparation</a></li>
-  <li><a href="#ex-data-prep" id="toc-ex-data-prep" class="nav-link" data-scroll-target="#ex-data-prep">ex data Prep</a></li>
+  <li><a href="#ex-data-prep" id="toc-ex-data-prep" class="nav-link" data-scroll-target="#ex-data-prep">EX Data Prep</a></li>
   <li><a href="#expanding-dose" id="toc-expanding-dose" class="nav-link" data-scroll-target="#expanding-dose">EXPANDING DOSE</a></li>
   <li><a href="#find-first-dose-per-treatment-per-subject" id="toc-find-first-dose-per-treatment-per-subject" class="nav-link" data-scroll-target="#find-first-dose-per-treatment-per-subject">Find first dose per treatment per subject</a>
   <ul class="collapse">
@@ -821,7 +821,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </section>
 <section id="ex-data-prep" class="level2">
-<h2 class="anchored" data-anchor-id="ex-data-prep">ex data Prep</h2>
+<h2 class="anchored" data-anchor-id="ex-data-prep">EX Data Prep</h2>
 <div id="12" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>ex_prep <span class="op">=</span> <span class="pp">@chain</span> ex <span class="cf">begin</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@rsubset</span> <span class="op">:</span>EXDOSE <span class="op">&gt;</span> <span class="fl">0</span></span>
