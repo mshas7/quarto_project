@@ -317,8 +317,7 @@ first(dtype, 5)
 
 ```
 
-
-
+#  Combine original records and DTYPE copy records
 
 ```{julia}
 adpc_dtype = @chain vcat(adpc_aval, dtype; cols = :union) begin

@@ -171,6 +171,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   <li><a href="#derive-analysis-variables" id="toc-derive-analysis-variables" class="nav-link" data-scroll-target="#derive-analysis-variables">Derive Analysis Variables</a></li>
   <li><a href="#create-dtype-copy-records" id="toc-create-dtype-copy-records" class="nav-link" data-scroll-target="#create-dtype-copy-records">Create DTYPE copy records</a></li>
+  <li><a href="#combine-original-records-and-dtype-copy-records" id="toc-combine-original-records-and-dtype-copy-records" class="nav-link" data-scroll-target="#combine-original-records-and-dtype-copy-records">Combine original records and DTYPE copy records</a></li>
   <li><a href="#derive-base-and-calculate-change-from-baseline" id="toc-derive-base-and-calculate-change-from-baseline" class="nav-link" data-scroll-target="#derive-base-and-calculate-change-from-baseline">Derive BASE and Calculate Change from Baseline</a></li>
   <li><a href="#calculate-chg-for-post-baseline-records" id="toc-calculate-chg-for-post-baseline-records" class="nav-link" data-scroll-target="#calculate-chg-for-post-baseline-records">Calculate CHG for post-baseline records</a></li>
   <li><a href="#add-aseq" id="toc-add-aseq" class="nav-link" data-scroll-target="#add-aseq">Add ASEQ</a></li>
@@ -4472,6 +4473,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
+</section>
+<section id="combine-original-records-and-dtype-copy-records" class="level1">
+<h1>Combine original records and DTYPE copy records</h1>
 <div id="30" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>adpc_dtype <span class="op">=</span> <span class="pp">@chain</span> <span class="fu">vcat</span>(adpc_aval, dtype; cols <span class="op">=</span> <span class="op">:</span>union) <span class="cf">begin</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sort!</span>([<span class="op">:</span>STUDYID, <span class="op">:</span>USUBJID, <span class="op">:</span>BASETYPE, <span class="op">:</span>ADTM, <span class="op">:</span>NFRLT])</span>

@@ -6,6 +6,10 @@ julia:
       - "--project=."
 ---
 
+**Reference:** This article was used as a reference — [CDISC Pilot NCA Analysis](https://agstn.github.io/CPR_gtsummary/CPR_gtsummary.html)
+
+
+
 <details>
 <summary> Package Imports and Setup</summary>
 
